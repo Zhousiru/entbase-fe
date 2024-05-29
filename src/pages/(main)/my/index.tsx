@@ -1,7 +1,7 @@
 export default function Page() {
   return (
     <>
-      <div className="text-red-500">shared</div>
+      <div>个人空间</div>
     </>
   )
 }

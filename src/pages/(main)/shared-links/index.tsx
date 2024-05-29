@@ -1,7 +1,7 @@
 export default function Page() {
   return (
     <>
-      <div className="text-red-500">recycle</div>
+      <div>共享链接管理</div>
     </>
   )
 }

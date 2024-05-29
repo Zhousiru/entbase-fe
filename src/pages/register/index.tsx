@@ -1,7 +1,7 @@
 export default function Page() {
   return (
     <>
-      <div className="text-red-500">register</div>
+      <div>注册</div>
     </>
   )
 }

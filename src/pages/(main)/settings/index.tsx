@@ -1,7 +1,7 @@
 export default function Page() {
   return (
     <>
-      <div className="text-red-500">superme</div>
+      <div>设置</div>
     </>
   )
 }

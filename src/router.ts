@@ -3,7 +3,14 @@
 
 import { components, hooks, utils } from '@generouted/react-router/client'
 
-export type Path = `/` | `/login` | `/manager` | `/recycle` | `/register` | `s`
+export type Path =
+  | `/`
+  | `/buckets`
+  | `/login`
+  | `/my`
+  | `/register`
+  | `/settings`
+  | `/shared-links`
 
 export type Params = {}
 

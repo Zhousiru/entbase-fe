@@ -1,7 +1,5 @@
+import { Navigate } from 'react-router-dom'
+
 export default function Page() {
-  return (
-    <>
-      <div className="text-red-500">ds</div>
-    </>
-  )
+  return <Navigate to="/my" replace />
 }

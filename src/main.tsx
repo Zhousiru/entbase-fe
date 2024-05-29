@@ -1,10 +1,14 @@
-import { Routes } from '@generouted/react-router'
+import { Routes } from '@generouted/react-router/lazy'
+import { MantineProvider } from '@mantine/core'
+import '@mantine/core/styles.css'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <Routes />
+    <MantineProvider>
+      <Routes />
+    </MantineProvider>
   </React.StrictMode>,
 )
