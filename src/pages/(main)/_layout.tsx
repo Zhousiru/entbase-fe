@@ -1,8 +1,9 @@
+import avatarImage from '@/assets/avatar.jpg'
+import { AppLogo } from '@/components/app-logo'
 import { cn } from '@/utils/cn'
 import { AppShell, Burger } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
-  IconDatabaseSmile,
   IconHome,
   IconLink,
   IconLogout,
@@ -11,8 +12,6 @@ import {
 } from '@tabler/icons-react'
 import { ReactNode } from 'react'
 import { NavLink, Outlet, To } from 'react-router-dom'
-
-import avatarImage from '@/assets/avatar.jpg'
 
 function MenuLink({
   to,
@@ -55,17 +54,7 @@ export default function Layout() {
       >
         <AppShell.Header className="flex items-center gap-4 px-4">
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-          <div className="flex items-center gap-2">
-            <IconDatabaseSmile
-              size={36}
-              stroke={1.2}
-              className="text-blue-500"
-            />
-            <div className="font-comfortaa text-2xl font-semibold">
-              entbase
-              <span className="text-blue-500">.</span>
-            </div>
-          </div>
+          <AppLogo />
         </AppShell.Header>
 
         <AppShell.Navbar className="flex flex-col">

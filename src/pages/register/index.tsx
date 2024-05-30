@@ -1,3 +1,4 @@
+import { AppLogo } from '@/components/app-logo'
 import {
   Button,
   Checkbox,
@@ -32,10 +33,15 @@ export default function Page() {
   })
 
   return (
-    <div className="mx-auto flex h-screen w-full max-w-xs flex-col items-center justify-center">
+    <div className="mt-[20vh] flex flex-col items-center gap-8">
+      <div className="flex items-center gap-4">
+        <AppLogo />
+        <div className="self-stretch border-l" />
+        <div className="text-lg font-light">注册</div>
+      </div>
       <form
         onSubmit={form.onSubmit((values) => console.log(values))}
-        className="flex w-full max-w-[400px] flex-col gap-2 rounded-md bg-white p-4 shadow-md"
+        className="relative flex w-full max-w-[400px] flex-col gap-2 overflow-hidden rounded-md border bg-white p-4 shadow-md"
       >
         <TextInput
           label="邮箱"
@@ -63,6 +69,8 @@ export default function Page() {
         <Group justify="flex-end" mt="md">
           <Button type="submit">注册</Button>
         </Group>
+
+        <div className="absolute inset-x-0 top-0 h-1 bg-blue-500"></div>
       </form>
     </div>
   )
