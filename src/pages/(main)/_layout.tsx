@@ -27,7 +27,7 @@ function MenuLink({
       to={to}
       className={({ isActive }) =>
         cn(
-          'flex h-12 items-center gap-2 px-4 font-light transition',
+          'flex h-12 items-center gap-2 px-4 font-light',
           isActive && 'bg-blue-500/10 text-blue-500',
           className,
         )
