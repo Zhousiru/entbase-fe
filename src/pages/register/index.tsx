@@ -7,8 +7,15 @@ import {
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 
+interface Fields {
+  email: string
+  password: string
+  confirmPassword: string
+  termsOfService: boolean
+}
+
 export default function Page() {
-  const form = useForm({
+  const form = useForm<Fields>({
     mode: 'uncontrolled',
     initialValues: {
       email: '',
@@ -18,9 +25,8 @@ export default function Page() {
     },
 
     validate: {
-      email: (value: string) =>
-        /^\S+@\S+$/.test(value) ? null : '请输入正确的邮箱',
-      confirmPassword: (value: string, values: string) =>
+      email: (value) => (/^\S+@\S+$/.test(value) ? null : '请输入正确的邮箱'),
+      confirmPassword: (value, values) =>
         value !== values.password ? '请确认是否密码一致' : null,
     },
   })
@@ -29,7 +35,7 @@ export default function Page() {
     <div className="mx-auto flex h-screen w-full max-w-xs flex-col items-center justify-center">
       <form
         onSubmit={form.onSubmit((values) => console.log(values))}
-        className="w-[30vw]  min-w-[300px] rounded-md bg-white p-4 shadow-md"
+        className="flex w-full max-w-[400px] flex-col gap-2 rounded-md bg-white p-4 shadow-md"
       >
         <TextInput
           label="邮箱"
@@ -38,23 +44,19 @@ export default function Page() {
           {...form.getInputProps('email')}
         />
         <PasswordInput
-          mt="sm"
           label="密码"
-          placeholder="Password"
           key={form.key('password')}
           {...form.getInputProps('password')}
         />
         <PasswordInput
-          mt="sm"
           label="确认密码"
           placeholder="Confirm password"
           key={form.key('confirmPassword')}
           {...form.getInputProps('confirmPassword')}
         />
         <Checkbox
-          mt="md"
           label="阅读并接受《服务条款》和《隐私政策》"
-          size="12px"
+          size="xs"
           key={form.key('termsOfService')}
           {...form.getInputProps('termsOfService', { type: 'checkbox' })}
         />

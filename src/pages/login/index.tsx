@@ -20,7 +20,7 @@ export default function Page() {
     <div className="mx-auto flex h-screen w-full max-w-xs flex-col items-center justify-center">
       <form
         onSubmit={form.onSubmit((values) => console.log(values))}
-        className="fle  w-[30vw] min-w-[300px] rounded-md bg-white p-4 shadow-md"
+        className="flex w-full max-w-[400px] flex-col gap-2 rounded-md bg-white p-4 shadow-md"
       >
         <TextInput
           label="邮箱"
@@ -29,22 +29,17 @@ export default function Page() {
           {...form.getInputProps('email')}
         />
         <PasswordInput
-          mt="sm"
           label="密码"
           placeholder="Password"
           key={form.key('password')}
           {...form.getInputProps('password')}
         />
         <TextInput
-          mt="sm"
           label="验证码"
           key={form.key('code')}
           {...form.getInputProps('code')}
         />
-        <Link
-          to="/register"
-          className="mt-4  text-xs	  text-gray-400 hover:text-gray-700"
-        >
+        <Link to="/register" className="text-xs opacity-50 hover:opacity-75">
           没有账号？前往注册
         </Link>
         <Group justify="flex-end" mt="md">
