@@ -13,6 +13,7 @@
   "dependencies": {
     "@generouted/react-router": "^1.19.5",
     "@mantine/core": "^7.10.0",
+    "@mantine/form": "^7.10.0",
     "@mantine/hooks": "^7.10.0",
     "@tabler/icons-react": "^3.5.0",
     "clsx": "^2.1.1",
