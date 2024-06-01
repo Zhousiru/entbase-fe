@@ -1,3 +1,4 @@
+import { DoRequestWithErrorMessage } from '@/api'
 import { AppLogo } from '@/components/app-logo'
 import {
   Button,
@@ -7,12 +8,26 @@ import {
   TextInput,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
+import { useMutation } from '@tanstack/react-query'
 
 interface Fields {
   email: string
   password: string
   confirmPassword: string
   termsOfService: boolean
+}
+
+async function register(values: any) {
+  await DoRequestWithErrorMessage(
+    '/user/register',
+    'post',
+    {
+      email: values.email,
+      code: values.code,
+      password: values.password,
+    },
+    false,
+  )
 }
 
 export default function Page() {
@@ -31,7 +46,12 @@ export default function Page() {
         value !== values.password ? '请确认是否密码一致' : null,
     },
   })
-
+  const registerMutation = useMutation({
+    mutationFn: register,
+    onSuccess: (data) => {
+      console.log(data)
+    },
+  })
   return (
     <div className="mt-[20vh] flex flex-col items-center gap-8">
       <div className="flex items-center gap-4">
@@ -40,7 +60,9 @@ export default function Page() {
         <div className="text-lg font-light">注册</div>
       </div>
       <form
-        onSubmit={form.onSubmit((values) => console.log(values))}
+        onSubmit={form.onSubmit((values) =>
+          registerMutation.mutate({ ...values }),
+        )}
         className="relative flex w-full max-w-[400px] flex-col gap-2 overflow-hidden rounded-md border bg-white p-4 shadow-md"
       >
         <TextInput
