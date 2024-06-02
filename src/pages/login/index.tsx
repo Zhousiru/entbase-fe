@@ -70,9 +70,7 @@ export default function Page() {
           没有账号？前往注册
         </Link>
         <Group justify="flex-end" mt="md">
-          <Button type="submit" onClick={() => mutation.mutate()}>
-            登录
-          </Button>
+          <Button type="submit">登录</Button>
         </Group>
 
         <div className="absolute inset-x-0 top-0 h-1 bg-blue-500"></div>

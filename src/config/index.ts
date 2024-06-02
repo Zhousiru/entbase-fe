@@ -1,3 +1,3 @@
 export const apiConfig = {
-  baseUrl: 'https://127.0.0.1:8080',
+  baseUrl: 'http://43.134.163.165:18080',
 }
