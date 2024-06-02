@@ -1,41 +1,47 @@
-import { DoRequestWithErrorMessage } from '@/api'
+import { $axios } from '@/api'
+import { ApiOk } from '@/api/types'
 import { AppLogo } from '@/components/app-logo'
+import { CaptchaImage, CaptchaImageRef } from '@/components/captcha-image'
 import { Link } from '@/router'
 import { Button, Group, PasswordInput, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useMutation } from '@tanstack/react-query'
-async function login(values: any) {
-  await DoRequestWithErrorMessage(
-    '/user/login',
-    'post',
-    {
-      email: values.email,
-      code: values.code,
-      password: values.password,
-    },
-    false,
-  )
+import { useRef } from 'react'
+
+interface Fiedls {
+  email: string
+  password: string
+  code: string
 }
 
 export default function Page() {
-  const form = useForm({
+  const form = useForm<Fiedls>({
     mode: 'uncontrolled',
     initialValues: {
       email: '',
       password: '',
       code: '',
     },
-
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : '请输入正确的邮箱'),
     },
   })
+  const captchaRef = useRef<CaptchaImageRef>(null)
+
   const loginMutation = useMutation({
-    mutationFn: login,
-    onSuccess: (data) => {
-      console.log(data)
+    mutationFn: (values: Fiedls) =>
+      $axios.post<ApiOk<string>>('/user/login', {
+        ...values,
+        codeId: captchaRef.current!.getCodeId(),
+      }),
+    onSuccess({ data }) {
+      alert('登陆成功\n' + data)
+    },
+    onError() {
+      alert('登陆失败')
     },
   })
+
   return (
     <div className="mt-[20vh] flex flex-col items-center gap-8">
       <div className="flex items-center gap-4">
@@ -44,9 +50,7 @@ export default function Page() {
         <div className="text-lg font-light">登录</div>
       </div>
       <form
-        onSubmit={form.onSubmit((values) =>
-          loginMutation.mutate({ ...values }),
-        )}
+        onSubmit={form.onSubmit((v) => loginMutation.mutate(v))}
         className="relative flex w-full max-w-[400px] flex-col gap-2 overflow-hidden rounded-md border bg-white p-4 shadow-md"
       >
         <TextInput
@@ -61,11 +65,17 @@ export default function Page() {
           key={form.key('password')}
           {...form.getInputProps('password')}
         />
-        <TextInput
-          label="验证码"
-          key={form.key('code')}
-          {...form.getInputProps('code')}
-        />
+
+        <div className="flex gap-1">
+          <TextInput
+            className="flex-grow"
+            label="验证码"
+            key={form.key('code')}
+            {...form.getInputProps('code')}
+          />
+          <CaptchaImage ref={captchaRef} className="self-end" />
+        </div>
+
         <Link to="/register" className="text-xs opacity-50 hover:opacity-75">
           没有账号？前往注册
         </Link>
