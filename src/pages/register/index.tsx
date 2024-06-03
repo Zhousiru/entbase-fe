@@ -1,8 +1,15 @@
-import { DoRequestWithErrorMessage } from '@/api'
+import { $axios } from '@/api'
+import { ApiOk } from '@/api/types'
 import { AppLogo } from '@/components/app-logo'
-import { Button, Group, Stepper } from '@mantine/core'
-
-import { Checkbox, PasswordInput, PinInput, TextInput } from '@mantine/core'
+import {
+  Button,
+  Checkbox,
+  Group,
+  PasswordInput,
+  PinInput,
+  Stepper,
+  TextInput,
+} from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useMutation } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
@@ -15,39 +22,31 @@ interface Fields {
   termsOfService: boolean
 }
 
+interface Captcha {
+  codeId: string
+  base64: string
+}
+
 async function register(values: any) {
-  await DoRequestWithErrorMessage(
-    '/user/register',
-    'post',
-    {
-      email: values.email,
-      code: values.code,
-      password: values.password,
-    },
-    false,
-  )
+  await $axios.post<ApiOk<string>>('/user/register', {
+    email: values.email,
+    code: values.code,
+    password: values.password,
+  })
 }
 async function getCaptcha() {
-  const res = await DoRequestWithErrorMessage(
-    '/user/get-captcha',
-    'get',
-    {},
-    false,
-  )
+  const res = await $axios.get<ApiOk<Captcha>>('/user/get-captcha', {})
   return res
 }
 async function getEmailCode(values: any) {
-  const res = await DoRequestWithErrorMessage(
-    '/user/get-email-code',
-    'post',
-    { ...values },
-    false,
-  )
+  const res = await $axios.post<ApiOk<string>>('/user/get-email-code', {
+    ...values,
+  })
   return res
 }
 
 export default function Page() {
-  const [baseImg, setBaseImg] = useState({ base64: '', codeId: '' })
+  const [baseImg, setBaseImg] = useState<Captcha>({ base64: '', codeId: '' })
   const [active, setActive] = useState(0)
   const nextStep = () => {
     setActive((current) => (current < 3 ? current + 1 : current))
@@ -77,23 +76,24 @@ export default function Page() {
   const getCaptchaMutation = useMutation({
     mutationFn: getCaptcha,
     onSuccess: (res) => {
-      setBaseImg(res.data)
+      setBaseImg(res.data.data)
     },
   })
   const getEmailCodeMutation = useMutation({
     mutationFn: getEmailCode,
     onSuccess: (res) => {
-      setBaseImg(res.data)
+      // setBaseImg(res.data)
     },
   })
   const registerMutation = useMutation({
     mutationFn: register,
-    onSuccess: (data) => {
-      console.log(data)
+    onSuccess: (res) => {
+      // console.log(data)
     },
   })
   useEffect(() => {
     getCaptchaMutation.mutate()
+    // console.log(111, baseImg)
   }, [])
   return (
     <div className="mt-[20vh] flex flex-col items-center gap-8">
