@@ -1,90 +1,86 @@
 import { $axios } from '@/api'
+import { setToken } from '@/api/token'
 import { ApiOk } from '@/api/types'
 import { AppLogo } from '@/components/app-logo'
-import { CaptchaImage } from '@/components/captcha-image'
+import { CaptchaImage, CaptchaImageRef } from '@/components/captcha-image'
+import { notificationError } from '@/constants/notifications'
 import {
+  Alert,
   Button,
-  Checkbox,
-  Group,
+  LoadingOverlay,
   PasswordInput,
   PinInput,
-  Stepper,
   TextInput,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
+import { notifications } from '@mantine/notifications'
+import { IconCheck, IconInfoCircle } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 interface Fields {
   email: string
   password: string
-  code: string
-  confirmPassword: string
-  termsOfService: boolean
-}
-
-interface Captcha {
-  codeId: string
-  base64: string
-}
-
-async function register(values: any) {
-  await $axios.post<ApiOk<string>>('/user/register', {
-    email: values.email,
-    code: values.code,
-    password: values.password,
-  })
-}
-async function getCaptcha() {
-  const res = await $axios.get<ApiOk<Captcha>>('/user/get-captcha', {})
-  return res
-}
-async function getEmailCode(values: any) {
-  const res = await $axios.post<ApiOk<string>>('/user/get-email-code', {
-    ...values,
-  })
-  return res
+  _confirmPassword: string
+  imageCode: string
+  emailCode: string
 }
 
 export default function Page() {
-  const [baseImg, setBaseImg] = useState<Captcha>({ base64: '', codeId: '' })
-  const [active, setActive] = useState(0)
-  const nextStep = () => {
-    setActive((current) => (current < 3 ? current + 1 : current))
-  }
-  const prevStep = () => setActive((current) => (current > 0 ? 0 : current))
-  const [registerForm, setRegisterForm] = useState({
-    email: '',
-    code: '',
-    password: '',
-  })
+  const [stage, setStage] = useState<'fill' | 'verify' | 'done'>('verify')
+  const captchaRef = useRef<CaptchaImageRef>(null)
+
   const form = useForm<Fields>({
     mode: 'uncontrolled',
     initialValues: {
       email: '',
-      code: '',
       password: '',
-      confirmPassword: '',
-      termsOfService: false,
+      _confirmPassword: '',
+      imageCode: '',
+      emailCode: '',
     },
-
     validate: {
-      email: (value) => (/^\S+@\S+$/.test(value) ? null : '请输入正确的邮箱'),
-      confirmPassword: (value, values) =>
-        value !== values.password ? '请确认是否密码一致' : null,
+      email: (value) => (!/^\S+@\S+$/.test(value) ? '请输入正确的邮箱' : null),
+      _confirmPassword: (value, values) =>
+        value !== values.password ? '密码不一致' : null,
     },
   })
 
   const getEmailCodeMutation = useMutation({
-    mutationFn: getEmailCode,
-    onSuccess: (res) => {
-      // setBaseImg(res.data)
+    mutationFn: (v: Fields) =>
+      $axios.post<ApiOk<string>>('/user/get-email-code', {
+        email: v.email,
+        imageCode: v.imageCode,
+        imageCodeId: captchaRef.current!.getCodeId(),
+      }),
+    onSuccess: () => {
+      setStage('verify')
+    },
+    onError(e) {
+      notifications.show({
+        ...notificationError,
+        message: e.message,
+      })
     },
   })
+
   const registerMutation = useMutation({
-    mutationFn: register,
-    onSuccess: (res) => {
-      // console.log(data)
+    mutationFn: (v: Fields) =>
+      $axios.post<ApiOk<string>>('/user/register', {
+        email: v.email,
+        password: v.password,
+        code: v.emailCode,
+      }),
+    onSuccess: ({ data }) => {
+      setToken(data.data)
+      setStage('done')
+    },
+    onError(e) {
+      notifications.show({
+        ...notificationError,
+        message: e.message,
+      })
     },
   })
 
@@ -96,96 +92,77 @@ export default function Page() {
         <div className="text-lg font-light">注册</div>
       </div>
 
-      <div className="relative flex w-full max-w-[500px] flex-col items-center gap-2 overflow-hidden rounded-md border bg-white p-4 shadow-md">
-        <Stepper active={active} onStepClick={setActive}>
-          <Stepper.Step label="First step" description="Create an account">
-            <form
-              onSubmit={form.onSubmit((values) => {
-                getEmailCodeMutation.mutate({
-                  email: values.email,
-                  imageCode: values.code,
-                  imageCodeId: 'codeId',
-                })
-                setRegisterForm({
-                  email: values.email,
-                  password: values.password,
-                  code: '',
-                })
-                nextStep()
-              })}
-            >
+      <div className="relative flex w-full max-w-[350px] flex-col items-center gap-2 overflow-hidden rounded-md border bg-white p-4 shadow-md">
+        <form
+          className="w-full"
+          onSubmit={form.onSubmit((v) => {
+            getEmailCodeMutation.mutate(v)
+          })}
+        >
+          <LoadingOverlay
+            visible={
+              getEmailCodeMutation.isPending || registerMutation.isPending
+            }
+          />
+
+          {stage === 'fill' && (
+            <div className="flex flex-col gap-2">
               <TextInput
                 label="邮箱"
-                placeholder="xxx@email.com"
                 key={form.key('email')}
                 {...form.getInputProps('email')}
               />
-              <PasswordInput
-                label="密码"
-                key={form.key('password')}
-                {...form.getInputProps('password')}
-              />
+              <PasswordInput label="密码" {...form.getInputProps('password')} />
               <PasswordInput
                 label="确认密码"
-                placeholder="Confirm password"
-                key={form.key('confirmPassword')}
-                {...form.getInputProps('confirmPassword')}
+                {...form.getInputProps('_confirmPassword')}
               />
 
-              <div className="flex flex-row flex-nowrap  items-end gap-4 ">
+              <div className="flex items-end gap-1">
                 <TextInput
                   className="flex-1"
                   label="验证码"
-                  key={form.key('code')}
-                  {...form.getInputProps('code')}
+                  key={form.key('imageCode')}
+                  {...form.getInputProps('imageCode')}
                 />
 
-                <CaptchaImage></CaptchaImage>
+                <CaptchaImage ref={captchaRef} />
               </div>
-              <Checkbox
-                label="阅读并接受《服务条款》和《隐私政策》"
-                size="xs"
-                key={form.key('termsOfService')}
-                {...form.getInputProps('termsOfService', { type: 'checkbox' })}
-              />
-              <Group justify="center" mt="md">
-                <Button type="reset" onClick={() => form.reset()}>
-                  清空表单
-                </Button>
-                <Button type="submit">下一步</Button>
-              </Group>
-            </form>
-          </Stepper.Step>
 
-          <Stepper.Step label="Second step" description="Confirm Email code">
-            <PinInput
-              className="justify-center"
-              length={6}
-              onComplete={(value) => {
-                setRegisterForm({
-                  ...registerForm,
-                  code: value,
-                })
-              }}
-            />
-            <Group justify="center" mt="md">
-              <Button variant="default" onClick={prevStep}>
-                重新开始
+              <Button className="mt-4" variant="light" type="submit">
+                下一步
               </Button>
-              <Button
-                type="submit"
-                onClick={() => {
-                  registerMutation.mutate(registerForm), nextStep()
-                }}
-              >
+            </div>
+          )}
+
+          {stage === 'verify' && (
+            <div className="flex flex-col">
+              <Alert color="blue" icon={<IconInfoCircle />} title="需要验证">
+                验证邮件已发送至 {form.getValues().email}
+              </Alert>
+              <PinInput
+                className="my-10 justify-center"
+                length={6}
+                type="number"
+                key={form.key('emailCode')}
+                {...form.getInputProps('emailCode')}
+              />
+              <Button onClick={() => registerMutation.mutate(form.getValues())}>
                 注册
               </Button>
-            </Group>
-          </Stepper.Step>
-          <Stepper.Completed>
-            Completed, click back button to get to previous step
-          </Stepper.Completed>
-        </Stepper>
+            </div>
+          )}
+        </form>
+
+        {stage === 'done' && (
+          <div className="flex w-full flex-col items-center p-8">
+            <IconCheck size={48} stroke={1} className="text-blue-500" />
+            <div className="mt-2 font-light">注册成功</div>
+            <Button component={Link} to="/" className="mt-8">
+              继续
+            </Button>
+          </div>
+        )}
 
         <div className="absolute inset-x-0 top-0 h-1 bg-blue-500"></div>
       </div>

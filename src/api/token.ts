@@ -47,6 +47,10 @@ export function useTokenPayload() {
   return payload
 }
 
+export function setToken(token: string) {
+  localStorage.setItem('token', token)
+}
+
 export class TokenError extends Error {}
 export class InvalidTokenError extends TokenError {}
 export class EmptyTokenError extends TokenError {}
