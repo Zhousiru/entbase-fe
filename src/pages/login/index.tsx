@@ -77,6 +77,7 @@ export default function Page() {
         <Link to="/register" className="text-xs opacity-50 hover:opacity-75">
           没有账号？前往注册
         </Link>
+
         <Group justify="flex-end" mt="md">
           <Button type="submit">登录</Button>
         </Group>

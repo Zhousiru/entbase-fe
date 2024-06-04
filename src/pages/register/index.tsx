@@ -129,6 +129,10 @@ export default function Page() {
                 <CaptchaImage ref={captchaRef} />
               </div>
 
+              <Link to="/login" className="text-xs opacity-50 hover:opacity-75">
+                已有账号？前往登录
+              </Link>
+
               <Button className="mt-4" variant="light" type="submit">
                 下一步
               </Button>
