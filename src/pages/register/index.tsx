@@ -1,6 +1,7 @@
 import { $axios } from '@/api'
 import { ApiOk } from '@/api/types'
 import { AppLogo } from '@/components/app-logo'
+import { CaptchaImage } from '@/components/captcha-image'
 import {
   Button,
   Checkbox,
@@ -12,7 +13,7 @@ import {
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useMutation } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 interface Fields {
   email: string
@@ -73,12 +74,7 @@ export default function Page() {
         value !== values.password ? '请确认是否密码一致' : null,
     },
   })
-  const getCaptchaMutation = useMutation({
-    mutationFn: getCaptcha,
-    onSuccess: (res) => {
-      setBaseImg(res.data.data)
-    },
-  })
+
   const getEmailCodeMutation = useMutation({
     mutationFn: getEmailCode,
     onSuccess: (res) => {
@@ -91,10 +87,7 @@ export default function Page() {
       // console.log(data)
     },
   })
-  useEffect(() => {
-    getCaptchaMutation.mutate()
-    // console.log(111, baseImg)
-  }, [])
+
   return (
     <div className="mt-[20vh] flex flex-col items-center gap-8">
       <div className="flex items-center gap-4">
@@ -111,7 +104,7 @@ export default function Page() {
                 getEmailCodeMutation.mutate({
                   email: values.email,
                   imageCode: values.code,
-                  imageCodeId: baseImg.codeId,
+                  imageCodeId: 'codeId',
                 })
                 setRegisterForm({
                   email: values.email,
@@ -146,11 +139,8 @@ export default function Page() {
                   key={form.key('code')}
                   {...form.getInputProps('code')}
                 />
-                <img
-                  className="h-[35px]"
-                  src={`data:image/jpeg;base64,${baseImg.base64}`}
-                  alt="Base64 Encoded"
-                />
+
+                <CaptchaImage></CaptchaImage>
               </div>
               <Checkbox
                 label="阅读并接受《服务条款》和《隐私政策》"
