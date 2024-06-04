@@ -1,12 +1,16 @@
 import { $axios } from '@/api'
+import { setToken } from '@/api/token'
 import { ApiOk } from '@/api/types'
 import { AppLogo } from '@/components/app-logo'
 import { CaptchaImage, CaptchaImageRef } from '@/components/captcha-image'
+import { notificationError } from '@/constants/notifications'
 import { Link } from '@/router'
 import { Button, Group, PasswordInput, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
+import { notifications } from '@mantine/notifications'
 import { useMutation } from '@tanstack/react-query'
 import { useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 interface Fiedls {
   email: string
@@ -28,6 +32,8 @@ export default function Page() {
   })
   const captchaRef = useRef<CaptchaImageRef>(null)
 
+  const navigate = useNavigate()
+
   const loginMutation = useMutation({
     mutationFn: (values: Fiedls) =>
       $axios.post<ApiOk<string>>('/user/login', {
@@ -35,10 +41,14 @@ export default function Page() {
         codeId: captchaRef.current!.getCodeId(),
       }),
     onSuccess({ data }) {
-      alert('登陆成功\n' + data)
+      setToken(data.data)
+      navigate('/')
     },
-    onError() {
-      alert('登陆失败')
+    onError(e) {
+      notifications.show({
+        ...notificationError,
+        message: e.message,
+      })
     },
   })
 

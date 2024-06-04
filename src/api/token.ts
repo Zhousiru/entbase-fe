@@ -28,19 +28,19 @@ export function getTokenWithPayload(): [string, TokenPayload] {
 }
 
 export function assertNotExpiredToken(payload: TokenPayload) {
-  if (new Date().getTime() > payload.exp) {
+  if (Date.now() > payload.exp * 1000) {
     throw new InvalidTokenError()
   }
 }
 
-export function useToken() {
+export function getValidToken() {
   const [token, payload] = getTokenWithPayload()
   assertNotExpiredToken(payload)
 
   return token
 }
 
-export function useTokenPayload() {
+export function getValidTokenPayload() {
   const [_, payload] = getTokenWithPayload()
   assertNotExpiredToken(payload)
 
@@ -49,6 +49,18 @@ export function useTokenPayload() {
 
 export function setToken(token: string) {
   localStorage.setItem('token', token)
+}
+
+export function checkIsValidToken() {
+  try {
+    getValidToken()
+  } catch (error) {
+    if (error instanceof TokenError) {
+      return false
+    }
+    throw error
+  }
+  return true
 }
 
 export class TokenError extends Error {}

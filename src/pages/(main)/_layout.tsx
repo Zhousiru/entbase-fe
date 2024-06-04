@@ -1,3 +1,4 @@
+import { checkIsValidToken, getValidTokenPayload, setToken } from '@/api/token'
 import avatarImage from '@/assets/avatar.jpg'
 import { AppLogo } from '@/components/app-logo'
 import { cn } from '@/utils/cn'
@@ -11,7 +12,7 @@ import {
   IconShare,
 } from '@tabler/icons-react'
 import { ReactNode } from 'react'
-import { NavLink, Outlet, To } from 'react-router-dom'
+import { NavLink, Navigate, Outlet, To, useNavigate } from 'react-router-dom'
 
 function MenuLink({
   to,
@@ -40,6 +41,13 @@ function MenuLink({
 
 export default function Layout() {
   const [opened, { toggle }] = useDisclosure()
+  const navigate = useNavigate()
+
+  if (!checkIsValidToken()) {
+    return <Navigate to="/login" replace />
+  }
+
+  const tokenPayload = getValidTokenPayload()
 
   return (
     <>
@@ -61,7 +69,7 @@ export default function Layout() {
           <div className="flex items-center gap-2 border-b p-4">
             <div className="flex-grow leading-tight">
               <div className="opacity-50">Hi,</div>
-              <div className="text-2xl">Cirno</div>
+              <div className="text-2xl">{tokenPayload.username}</div>
             </div>
             <div className="rela relative aspect-square h-full flex-shrink-0">
               <img
@@ -84,7 +92,13 @@ export default function Layout() {
             <IconSettings stroke={1} /> 设置
           </MenuLink>
 
-          <button className="mt-auto flex h-12 items-center gap-2 border-t px-4 font-light">
+          <button
+            className="mt-auto flex h-12 items-center gap-2 border-t px-4 font-light"
+            onClick={() => {
+              setToken('')
+              navigate('/')
+            }}
+          >
             <IconLogout stroke={1} /> 登出
           </button>
         </AppShell.Navbar>

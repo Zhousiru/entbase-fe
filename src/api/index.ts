@@ -1,6 +1,6 @@
 import { apiConfig } from '@/config'
 import axios from 'axios'
-import { InvalidTokenError, useToken } from './token'
+import { InvalidTokenError, getValidToken } from './token'
 import { Api } from './types'
 
 export const $axios = axios.create({
@@ -13,7 +13,7 @@ $axios.interceptors.request.use(
     const url = config.url
 
     if (url && apiConfig.protectedUrls.some((x) => url.startsWith(x))) {
-      config.headers.Authorization = useToken()
+      config.headers.Authorization = getValidToken()
     }
 
     return config
