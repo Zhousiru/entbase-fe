@@ -28,7 +28,7 @@ interface Fields {
 }
 
 export default function Page() {
-  const [stage, setStage] = useState<'fill' | 'verify' | 'done'>('verify')
+  const [stage, setStage] = useState<'fill' | 'verify' | 'done'>('fill')
   const captchaRef = useRef<CaptchaImageRef>(null)
 
   const form = useForm<Fields>({
