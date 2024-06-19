@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom'
 interface Fiedls {
   email: string
   password: string
-  code: string
+  imageCode: string
 }
 
 export default function Page() {
@@ -24,7 +24,7 @@ export default function Page() {
     initialValues: {
       email: '',
       password: '',
-      code: '',
+      imageCode: '',
     },
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : '请输入正确的邮箱'),
@@ -38,7 +38,7 @@ export default function Page() {
     mutationFn: (values: Fiedls) =>
       $axios.post<ApiOk<string>>('/user/login', {
         ...values,
-        codeId: captchaRef.current!.getCodeId(),
+        imageCodeId: captchaRef.current!.getCodeId(),
       }),
     onSuccess({ data }) {
       setToken(data.data)
@@ -78,8 +78,8 @@ export default function Page() {
           <TextInput
             className="flex-grow"
             label="验证码"
-            key={form.key('code')}
-            {...form.getInputProps('code')}
+            key={form.key('imageCode')}
+            {...form.getInputProps('imageCode')}
           />
           <CaptchaImage ref={captchaRef} className="self-end" />
         </div>
