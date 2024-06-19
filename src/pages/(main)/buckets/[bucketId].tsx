@@ -1,11 +1,11 @@
-import { IconMoodWink } from '@tabler/icons-react'
+import { IconDatabaseSmile } from '@tabler/icons-react'
 
 export default function Page() {
   return (
     <div className="grid h-full place-items-center opacity-25">
       <div className="grid place-items-center gap-2">
-        <IconMoodWink stroke={1} size={72} />
-        <p className="text-lg">选择一个存储桶吧</p>
+        <IconDatabaseSmile stroke={1} size={72} />
+        <p className="text-lg">TODO</p>
       </div>
     </div>
   )

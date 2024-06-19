@@ -58,7 +58,7 @@ export default function Layout() {
           breakpoint: 'sm',
           collapsed: { mobile: !opened },
         }}
-        padding="md"
+        padding={0}
       >
         <AppShell.Header className="flex items-center gap-4 px-4">
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />

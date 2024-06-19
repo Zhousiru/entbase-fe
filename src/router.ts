@@ -6,13 +6,16 @@ import { components, hooks, utils } from '@generouted/react-router/client'
 export type Path =
   | `/`
   | `/buckets`
+  | `/buckets/:bucketId`
   | `/login`
   | `/my`
   | `/register`
   | `/settings`
   | `/shared-links`
 
-export type Params = {}
+export type Params = {
+  '/buckets/:bucketId': { bucketId: string }
+}
 
 export type ModalPath = never
 
