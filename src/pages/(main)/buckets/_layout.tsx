@@ -1,5 +1,9 @@
+import { getValidTokenPayload } from '@/api/token'
+import { EditBucketModal } from '@/components/modals/edit-bucket'
+import { NewBucketModal } from '@/components/modals/new-bucket'
 import { cn } from '@/utils/cn'
-import { IconSearch } from '@tabler/icons-react'
+import { useDisclosure } from '@mantine/hooks'
+import { IconEdit, IconPlus, IconSearch } from '@tabler/icons-react'
 import { useState } from 'react'
 import { Link, Outlet, useParams } from 'react-router-dom'
 
@@ -12,24 +16,45 @@ function BucketItem({
   name: string
   activeId: number
 }) {
+  const editModal = useDisclosure()
+
   return (
-    <Link
-      to={`${id}`}
-      replace
-      className={cn(
-        'rounded border-y-2 border-transparent bg-white px-4 py-2 shadow-sm transition',
-        activeId !== -1 && 'opacity-50 group-hover:opacity-100',
-        activeId === id && 'border-b-blue-500 opacity-100',
-      )}
-    >
-      {name}
-    </Link>
+    <>
+      <div className="group/edit relative">
+        <Link
+          to={`${id}`}
+          replace
+          className={cn(
+            'block rounded border-y-2 border-transparent bg-white px-4 py-2 shadow-sm transition',
+            activeId !== -1 && 'opacity-50 group-hover:opacity-100',
+            activeId === id && 'border-b-blue-500 opacity-100',
+          )}
+        >
+          {name}
+        </Link>
+        <button
+          onClick={() => {
+            editModal[1].open()
+          }}
+          className="absolute right-2 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded opacity-0 transition hover:bg-black/5 group-hover/edit:opacity-100"
+        >
+          <IconEdit size={16} />
+        </button>
+      </div>
+      <EditBucketModal
+        id={id}
+        opened={editModal[0]}
+        onClose={editModal[1].close}
+      />
+    </>
   )
 }
 
 export default function Layout() {
   const params = useParams()
   const activeBucketId = params.bucketId ? Number(params.bucketId) : -1
+
+  const newModal = useDisclosure()
 
   const [buckets] = useState([
     {
@@ -57,7 +82,7 @@ export default function Layout() {
   return (
     <>
       <div className="flex h-[calc(100dvh-60px)]">
-        <div className="group flex w-[300px] flex-col border-r">
+        <div className="group relative flex w-[300px] flex-col border-r">
           <div className="flex items-center gap-2 border-b p-3">
             <IconSearch size={18} className="shrink-0" />
             <input
@@ -78,6 +103,14 @@ export default function Layout() {
               ))}
             </div>
           </div>
+          {getValidTokenPayload().isAdmin && (
+            <button
+              onClick={newModal[1].open}
+              className="absolute bottom-4 right-4 grid h-12 w-12 place-items-center rounded-full bg-blue-500 text-white shadow-lg shadow-blue-200 transition hover:-translate-y-1"
+            >
+              <IconPlus />
+            </button>
+          )}
         </div>
         <div className="relative flex-grow">
           <div className="absolute inset-0">
@@ -85,6 +118,7 @@ export default function Layout() {
           </div>
         </div>
       </div>
+      <NewBucketModal opened={newModal[0]} onClose={newModal[1].close} />
     </>
   )
 }

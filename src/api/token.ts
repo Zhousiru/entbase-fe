@@ -1,5 +1,5 @@
 interface TokenPayload {
-  isAdmin: string
+  isAdmin: boolean
   username: string
   userId: number
   icon: string
@@ -17,7 +17,7 @@ export function getTokenWithPayload(): [string, TokenPayload] {
   return [
     token,
     {
-      isAdmin: payload.IsAdmin,
+      isAdmin: payload.IsAdmin === '1',
       username: payload.UserName,
       userId: payload.UserId,
       icon: payload.Icon,
