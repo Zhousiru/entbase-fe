@@ -1,12 +1,9 @@
-import { IconDatabaseSmile } from '@tabler/icons-react'
+import ExplorerView from '@/components/explorer-view'
 
 export default function Page() {
   return (
-    <div className="grid h-full place-items-center opacity-25">
-      <div className="grid place-items-center gap-2">
-        <IconDatabaseSmile stroke={1} size={72} />
-        <p className="text-lg">TODO</p>
-      </div>
-    </div>
+    <>
+      <ExplorerView className="absolute inset-0" />
+    </>
   )
 }

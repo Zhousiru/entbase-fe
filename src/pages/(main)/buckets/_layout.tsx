@@ -83,7 +83,7 @@ export default function Layout() {
     <>
       <div className="flex h-[calc(100dvh-60px)]">
         <div className="group relative flex w-[300px] flex-col border-r">
-          <div className="flex items-center gap-2 border-b p-3">
+          <div className="box-border flex h-12 items-center gap-2 border-b p-3">
             <IconSearch size={18} className="shrink-0" />
             <input
               type="text"
