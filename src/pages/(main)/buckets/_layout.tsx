@@ -25,7 +25,7 @@ function BucketItem({
           to={`${id}`}
           replace
           className={cn(
-            'block rounded border-y-2 border-transparent bg-white px-4 py-2 shadow-sm transition',
+            'block rounded border-y-2 border-transparent bg-white  px-4 py-2 shadow-sm transition',
             activeId !== -1 && 'opacity-50 group-hover:opacity-100',
             activeId === id && 'border-b-blue-500 opacity-100',
           )}
@@ -41,11 +41,13 @@ function BucketItem({
           <IconEdit size={16} />
         </button>
       </div>
-      <EditBucketModal
-        id={id}
-        opened={editModal[0]}
-        onClose={editModal[1].close}
-      />
+      {getValidTokenPayload().isAdmin && (
+        <EditBucketModal
+          id={id}
+          opened={editModal[0]}
+          onClose={editModal[1].close}
+        />
+      )}
     </>
   )
 }
