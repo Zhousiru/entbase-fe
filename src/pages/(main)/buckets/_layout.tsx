@@ -1,10 +1,12 @@
+import { $axios } from '@/api'
 import { getValidTokenPayload } from '@/api/token'
+import { ApiOk } from '@/api/types'
 import { EditBucketModal } from '@/components/modals/edit-bucket'
 import { NewBucketModal } from '@/components/modals/new-bucket'
 import { cn } from '@/utils/cn'
 import { useDisclosure } from '@mantine/hooks'
 import { IconEdit, IconPlus, IconSearch } from '@tabler/icons-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, Outlet, useParams } from 'react-router-dom'
 
 function BucketItem({
@@ -58,29 +60,36 @@ export default function Layout() {
   const activeBucketId = params.bucketId ? Number(params.bucketId) : -1
 
   const newModal = useDisclosure()
+  const [buckets, setbBuckets] = useState<
+    Array<{
+      bucketId: number
+      bucketSpace: number
+      isPublic: string
+      foldPath: string
+      foldName: string
+    }>
+  >([])
+  function loadBucketList() {
+    $axios
+      .post<
+        ApiOk<
+          Array<{
+            bucketId: number
+            bucketSpace: number
+            isPublic: string
+            foldPath: string
+            foldName: string
+          }>
+        >
+      >('/user/list-buckets')
+      .then(({ data }) => {
+        setbBuckets(data.data)
+      })
+  }
 
-  const [buckets] = useState([
-    {
-      bucketId: 1,
-      bucketName: '共享存储桶 1',
-    },
-    {
-      bucketId: 2,
-      bucketName: '共享存储桶 2',
-    },
-    {
-      bucketId: 3,
-      bucketName: '共享存储桶 3',
-    },
-    {
-      bucketId: 4,
-      bucketName: '用户存储桶 Cirno',
-    },
-    {
-      bucketId: 5,
-      bucketName: '用户存储桶 bakaptr',
-    },
-  ])
+  useEffect(() => {
+    loadBucketList()
+  }, [])
 
   return (
     <>
@@ -100,7 +109,7 @@ export default function Layout() {
                 <BucketItem
                   key={bucket.bucketId}
                   id={bucket.bucketId}
-                  name={bucket.bucketName}
+                  name={bucket.foldName}
                   activeId={activeBucketId}
                 />
               ))}
