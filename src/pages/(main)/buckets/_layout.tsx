@@ -6,7 +6,7 @@ import { NewBucketModal } from '@/components/modals/new-bucket'
 import { cn } from '@/utils/cn'
 import { useDisclosure } from '@mantine/hooks'
 import { IconEdit, IconPlus, IconSearch } from '@tabler/icons-react'
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Link, Outlet, useParams } from 'react-router-dom'
 
 function BucketItem({
@@ -48,6 +48,7 @@ function BucketItem({
 
       <EditBucketModal
         id={id}
+        name={name}
         opened={editModal[0]}
         onClose={editModal[1].close}
       />
@@ -60,18 +61,11 @@ export default function Layout() {
   const activeBucketId = params.bucketId ? Number(params.bucketId) : -1
 
   const newModal = useDisclosure()
-  const [buckets, setbBuckets] = useState<
-    Array<{
-      bucketId: number
-      bucketSpace: number
-      isPublic: string
-      foldPath: string
-      foldName: string
-    }>
-  >([])
-  function loadBucketList() {
-    $axios
-      .post<
+
+  const { isSuccess, data } = useQuery({
+    queryKey: ['bucket-list'],
+    queryFn: () =>
+      $axios.post<
         ApiOk<
           Array<{
             bucketId: number
@@ -81,15 +75,8 @@ export default function Layout() {
             foldName: string
           }>
         >
-      >('/user/list-buckets')
-      .then(({ data }) => {
-        setbBuckets(data.data)
-      })
-  }
-
-  useEffect(() => {
-    loadBucketList()
-  }, [])
+      >('/user/list-buckets'),
+  })
 
   return (
     <>
@@ -105,14 +92,15 @@ export default function Layout() {
           </div>
           <div className="relative flex-grow bg-gray-50">
             <div className="absolute inset-0 flex flex-col gap-2 overscroll-y-auto p-2">
-              {buckets.map((bucket) => (
-                <BucketItem
-                  key={bucket.bucketId}
-                  id={bucket.bucketId}
-                  name={bucket.foldName}
-                  activeId={activeBucketId}
-                />
-              ))}
+              {isSuccess &&
+                data.data.data.map((bucket) => (
+                  <BucketItem
+                    key={bucket.bucketId}
+                    id={bucket.bucketId}
+                    name={bucket.foldName}
+                    activeId={activeBucketId}
+                  />
+                ))}
             </div>
           </div>
           {getValidTokenPayload().isAdmin && (
