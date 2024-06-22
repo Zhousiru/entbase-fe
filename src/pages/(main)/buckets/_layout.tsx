@@ -32,22 +32,23 @@ function BucketItem({
         >
           {name}
         </Link>
-        <button
-          onClick={() => {
-            editModal[1].open()
-          }}
-          className="absolute right-2 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded opacity-0 transition hover:bg-black/5 group-hover/edit:opacity-100"
-        >
-          <IconEdit size={16} />
-        </button>
+        {getValidTokenPayload().isAdmin && (
+          <button
+            onClick={() => {
+              editModal[1].open()
+            }}
+            className="absolute right-2 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded opacity-0 transition hover:bg-black/5 group-hover/edit:opacity-100"
+          >
+            <IconEdit size={16} />
+          </button>
+        )}
       </div>
-      {getValidTokenPayload().isAdmin && (
-        <EditBucketModal
-          id={id}
-          opened={editModal[0]}
-          onClose={editModal[1].close}
-        />
-      )}
+
+      <EditBucketModal
+        id={id}
+        opened={editModal[0]}
+        onClose={editModal[1].close}
+      />
     </>
   )
 }
