@@ -1,13 +1,10 @@
 import { $axios } from '@/api'
-import { ApiOk } from '@/api/types'
-import {
-  notificationError,
-  notificationSuccess,
-} from '@/constants/notifications'
-import { Button, Group, Modal, TextInput } from '@mantine/core'
+import { notificationError } from '@/constants/notifications'
+import { Button, Modal, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { notifications } from '@mantine/notifications'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
 
 interface Fiedls {
   bucketName: string
@@ -20,31 +17,32 @@ export function NewBucketModal({
   opened: boolean
   onClose: () => void
 }) {
-  const form = useForm({
+  const { reset, ...form } = useForm({
     mode: 'uncontrolled',
     initialValues: {
       bucketName: '',
     },
     validate: {
-      bucketName: (value) => (value.trim() === '' ? '请输入桶名！' : null),
+      bucketName: (value) => (value.trim() === '' ? '请输入存储桶名' : null),
     },
   })
 
+  const queryClient = useQueryClient()
+
+  useEffect(() => {
+    opened && reset()
+  }, [opened, reset])
+
   const createBucketMutation = useMutation({
     mutationFn: (v: Fiedls) =>
-      $axios.post<ApiOk<string>>(
+      $axios.post(
         '/admin/new-bucket',
         {},
         { params: { bucketName: v.bucketName } },
       ),
-    onSuccess({ data }) {
-      notifications.show({
-        ...notificationSuccess,
-        message: data.data,
-      })
-      setTimeout(() => {
-        location.reload()
-      }, 1000)
+    onSuccess() {
+      queryClient.invalidateQueries({ queryKey: ['bucket-list'] })
+      onClose()
     },
     onError(e) {
       notifications.show({
@@ -62,14 +60,14 @@ export function NewBucketModal({
         })}
       >
         <TextInput
-          label="命名："
+          label="存储桶名"
           key={form.key('bucketName')}
           {...form.getInputProps('bucketName')}
         />
 
-        <Group justify="flex-end" mt="md">
+        <div className="mt-4 flex justify-end gap-2">
           <Button type="submit">创建</Button>
-        </Group>
+        </div>
       </form>
     </Modal>
   )
