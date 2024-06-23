@@ -12,6 +12,7 @@ export type Path =
   | `/register`
   | `/settings`
   | `/shared-links`
+  | `s`
 
 export type Params = {
   '/buckets/:bucketId': { bucketId: string }
