@@ -7,6 +7,7 @@ import { cn } from '@/utils/cn'
 import { useDisclosure } from '@mantine/hooks'
 import { IconEdit, IconPlus, IconSearch } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { Link, Outlet, useParams } from 'react-router-dom'
 
 function BucketItem({
@@ -60,6 +61,8 @@ export default function Layout() {
   const params = useParams()
   const activeBucketId = params.bucketId ? Number(params.bucketId) : -1
 
+  const [nameFilter, setNameFilter] = useState('')
+
   const newModal = useDisclosure()
 
   const { isSuccess, data } = useQuery({
@@ -88,19 +91,23 @@ export default function Layout() {
               type="text"
               placeholder="在找存储桶？"
               className="flex-grow outline-none"
+              value={nameFilter}
+              onChange={(e) => setNameFilter(e.target.value)}
             />
           </div>
           <div className="relative flex-grow bg-gray-50">
             <div className="absolute inset-0 flex flex-col gap-2 overscroll-y-auto p-2">
               {isSuccess &&
-                data.data.data.map((bucket) => (
-                  <BucketItem
-                    key={bucket.bucketId}
-                    id={bucket.bucketId}
-                    name={bucket.foldName}
-                    activeId={activeBucketId}
-                  />
-                ))}
+                data.data.data
+                  .filter(({ foldName }) => foldName.includes(nameFilter))
+                  .map((bucket) => (
+                    <BucketItem
+                      key={bucket.bucketId}
+                      id={bucket.bucketId}
+                      name={bucket.foldName}
+                      activeId={activeBucketId}
+                    />
+                  ))}
             </div>
           </div>
           {getValidTokenPayload().isAdmin && (
