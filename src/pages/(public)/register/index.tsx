@@ -49,7 +49,7 @@ export default function Page() {
 
   const getEmailCodeMutation = useMutation({
     mutationFn: (v: Fields) =>
-      $axios.post<ApiOk<string>>('/user/get-email-code', {
+      $axios.post<ApiOk<string>>('/get-email-code', {
         email: v.email,
         imageCode: v.imageCode,
         imageCodeId: captchaRef.current!.getCodeId(),
@@ -67,7 +67,7 @@ export default function Page() {
 
   const registerMutation = useMutation({
     mutationFn: (v: Fields) =>
-      $axios.post<ApiOk<string>>('/user/register', {
+      $axios.post<ApiOk<string>>('/register', {
         email: v.email,
         password: v.password,
         code: v.emailCode,

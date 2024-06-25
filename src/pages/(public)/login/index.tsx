@@ -36,7 +36,7 @@ export default function Page() {
 
   const loginMutation = useMutation({
     mutationFn: (values: Fiedls) =>
-      $axios.post<ApiOk<string>>('/user/login', {
+      $axios.post<ApiOk<string>>('/login', {
         ...values,
         imageCodeId: captchaRef.current!.getCodeId(),
       }),

@@ -8,7 +8,10 @@ import { useEffect } from 'react'
 
 export default function Page() {
   const params = new URL(location.href).searchParams
-  const [id, password] = [params.get('id'), params.get('password')]
+  const url = window.location.href
+  const id = url || ''
+  const password = params.get('password')
+
   // const [fileInfo, setFileInfo] = useState<{
   //   userId: number
   //   fileName: string
@@ -28,7 +31,7 @@ export default function Page() {
   })
   const getFileMutation = useMutation({
     mutationFn: (v: string) =>
-      $axios.post(`/share/get/${id}`, {}, { params: { password: v } }),
+      $axios.post(`/share/get/${v}`, {}, { params: { password: v } }),
 
     onSuccess({ data }) {
       console.log(data)
@@ -41,7 +44,7 @@ export default function Page() {
     },
   })
   const getFileInfoMutation = useMutation({
-    mutationFn: () => $axios.post(`/share/get-info/${id}`, {}),
+    mutationFn: (v: string) => $axios.post(`/share/get-info/${v}`, {}),
 
     onSuccess({ data }) {
       console.log(data)
@@ -54,7 +57,7 @@ export default function Page() {
     },
   })
   useEffect(() => {
-    getFileInfoMutation.mutate()
+    getFileInfoMutation.mutate(id)
   }, [])
   return (
     <div className="relative flex w-full max-w-[700px] flex-row items-center gap-2 overflow-hidden rounded-md border bg-white p-4 shadow-md">

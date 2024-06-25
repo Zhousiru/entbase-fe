@@ -21,7 +21,7 @@ export const CaptchaImage = forwardRef<CaptchaImageRef, { className?: string }>(
 
     function refreshCaptcha() {
       $axios
-        .get<ApiOk<{ codeId: string; base64: string }>>('/user/get-captcha')
+        .post<ApiOk<{ codeId: string; base64: string }>>('/get-captcha')
         .then(({ data }) => {
           setImageData(data.data.base64)
           codeId.current = data.data.codeId

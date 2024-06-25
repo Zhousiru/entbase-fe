@@ -10,12 +10,13 @@ export type Path =
   | `/login`
   | `/my`
   | `/register`
+  | `/s/:slug`
   | `/settings`
   | `/shared-links`
-  | `s`
 
 export type Params = {
   '/buckets/:bucketId': { bucketId: string }
+  '/s/:slug': { slug: string }
 }
 
 export type ModalPath = never
