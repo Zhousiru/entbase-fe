@@ -15,3 +15,30 @@ export function isTextExt(ext: string) {
   }
   return false
 }
+
+export function joinPaths(...paths: string[]): string {
+  const normalizedPaths = paths.map((path) =>
+    path
+      .replace(/\\/g, '/')
+      .replace(/\/+/g, '/')
+      .replace(/\/\.$/, '/')
+      .replace(/\/$/, ''),
+  )
+
+  const joinedPath = '/' + normalizedPaths.filter((p) => p !== '').join('/')
+
+  return joinedPath
+}
+
+export function gotoParentPath(path: string): string {
+  if (!path || path === '/') {
+    return '/'
+  }
+
+  const parts = path.split('/').filter((part) => part !== '')
+  parts.pop()
+
+  const parentPath = '/' + parts.join('/')
+
+  return parentPath || '/'
+}

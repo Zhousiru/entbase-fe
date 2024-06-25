@@ -27,7 +27,7 @@ export function Item({
   onRename?: (name: string) => void
   onShare?: (name: string) => void
   onDelete?: (name: string) => void
-  onMoveInto?: (from: string) => void
+  onMoveInto?: (name: string, from: string) => void
 }) {
   const extension = name.substring(name.lastIndexOf('.') + 1)
   const [isDragging, setIsDragging] = useState(false)
@@ -47,7 +47,7 @@ export function Item({
   }
   function handleDrop(e: React.DragEvent<HTMLButtonElement>) {
     setIsDraggingOver(false)
-    onMoveInto && onMoveInto(e.dataTransfer.getData('text/plain'))
+    onMoveInto && onMoveInto(name, e.dataTransfer.getData('text/plain'))
   }
 
   return (
