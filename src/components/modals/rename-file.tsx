@@ -58,7 +58,11 @@ export function RenameFileModal({
 
   return (
     <Modal opened={opened} onClose={onClose} title="重命名文件">
-      <TextInput value={newName} onChange={(e) => setNewName(e.target.value)} />
+      <TextInput
+        label="新文件名"
+        value={newName}
+        onChange={(e) => setNewName(e.target.value)}
+      />
 
       <div className="mt-4 flex justify-end">
         <Button type="submit" onClick={() => mutation.mutate()}>

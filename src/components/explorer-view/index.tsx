@@ -15,6 +15,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import React, { useRef, useState } from 'react'
 import { gotoParentPath, joinPaths } from '../../utils/file'
+import { CreateShareModal } from '../modals/create-share'
 import { NewFolderModal } from '../modals/new-folder'
 import { RenameFileModal } from '../modals/rename-file'
 import { Item } from './item'
@@ -86,10 +87,13 @@ export default function ExplorerView({
 
   const renameModal = useDisclosure()
   const newFolderModal = useDisclosure()
+  const createShareModal = useDisclosure()
+
   const [renamePath, setRenamePath] = useState('')
+  const [sharePath, setSharePath] = useState('')
 
   function handleClick(name: string) {
-    if (!isSuccess) return null
+    if (!isSuccess) return
 
     if (name === '..') {
       setPath(gotoParentPath(path))
@@ -107,7 +111,14 @@ export default function ExplorerView({
     setRenamePath(joinPaths(path, name))
     renameModal[1].open()
   }
-  function handleShare(_name: string) {}
+  function handleShare(name: string) {
+    if (!isSuccess) return
+
+    const { path } = data.data.data.find((item) => item.fileName === name)!
+    setSharePath(path)
+
+    createShareModal[1].open()
+  }
   function handleDelete(name: string) {
     deleteFileMutation.mutate({ path: joinPaths(path, name) })
   }
@@ -256,6 +267,12 @@ export default function ExplorerView({
         path={path}
         opened={newFolderModal[0]}
         onClose={newFolderModal[1].close}
+      />
+      <CreateShareModal
+        bucketId={bucketId}
+        path={sharePath}
+        opened={createShareModal[0]}
+        onClose={createShareModal[1].close}
       />
     </>
   )

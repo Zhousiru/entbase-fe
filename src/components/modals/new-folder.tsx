@@ -55,6 +55,7 @@ export function NewFolderModal({
   return (
     <Modal opened={opened} onClose={onClose} title="新建文件夹">
       <TextInput
+        label="文件夹名"
         value={newFolderName}
         onChange={(e) => setNewFolderName(e.target.value)}
       />
