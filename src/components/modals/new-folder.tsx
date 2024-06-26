@@ -1,17 +1,12 @@
 import { $axios } from '@/api'
 import { notificationError } from '@/constants/notifications'
-import { gotoParentPath } from '@/utils/file'
+import { joinPaths } from '@/utils/file'
 import { Button, Modal, TextInput } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 
-function splitPath(path: string) {
-  const index = path.lastIndexOf('/')
-  return [path.substring(0, index + 1), path.substring(index + 1)]
-}
-
-export function RenameFileModal({
+export function NewFolderModal({
   bucketId,
   path,
   opened,
@@ -22,29 +17,30 @@ export function RenameFileModal({
   opened: boolean
   onClose: () => void
 }) {
-  const [newName, setNewName] = useState('')
-
-  const [parent, filename] = splitPath(path)
+  const [newFolderName, setNewFolderName] = useState('')
 
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    if (!opened) return
-    console.log(parent, filename)
-    setNewName(filename)
-  }, [filename, opened, parent, path])
+    opened && setNewFolderName('')
+  }, [opened])
 
   const mutation = useMutation({
     mutationFn: async () => {
-      await $axios.post('/file/move', {
-        bucketId,
-        sourcePath: path,
-        targetPath: parent + newName,
-      })
+      await $axios.post(
+        '/file/create-dir',
+        {},
+        {
+          params: {
+            bucketId,
+            path: joinPaths(path, newFolderName),
+          },
+        },
+      )
     },
     onSuccess() {
       queryClient.invalidateQueries({
-        queryKey: ['bucket-list', bucketId, gotoParentPath(path)],
+        queryKey: ['bucket-list', bucketId, path],
       })
       onClose()
     },
@@ -57,12 +53,15 @@ export function RenameFileModal({
   })
 
   return (
-    <Modal opened={opened} onClose={onClose} title="重命名文件">
-      <TextInput value={newName} onChange={(e) => setNewName(e.target.value)} />
+    <Modal opened={opened} onClose={onClose} title="新建文件夹">
+      <TextInput
+        value={newFolderName}
+        onChange={(e) => setNewFolderName(e.target.value)}
+      />
 
       <div className="mt-4 flex justify-end">
         <Button type="submit" onClick={() => mutation.mutate()}>
-          更新
+          创建
         </Button>
       </div>
     </Modal>

@@ -25,7 +25,10 @@ export function joinPaths(...paths: string[]): string {
       .replace(/\/$/, ''),
   )
 
-  const joinedPath = '/' + normalizedPaths.filter((p) => p !== '').join('/')
+  let joinedPath = normalizedPaths.filter((p) => p !== '').join('/')
+  if (!joinedPath.startsWith('/')) {
+    joinedPath = '/' + joinedPath
+  }
 
   return joinedPath
 }

@@ -10,7 +10,7 @@ import {
   IconTrash,
 } from '@tabler/icons-react'
 import React, { useState } from 'react'
-import { isImageExt, isTextExt } from './utils'
+import { isImageExt, isTextExt } from '../../utils/file'
 
 export function Item({
   name,
