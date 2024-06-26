@@ -47,6 +47,19 @@ export default function ExplorerView({
         },
       ),
   })
+  const { isSuccess: spaceIsSuccess, data: spaceData } = useQuery({
+    queryKey: ['bucket-space', bucketId],
+    queryFn: () =>
+      $axios.post<ApiOk<FileItem[]>>(
+        '/file/space',
+        {},
+        {
+          params: {
+            bucketId,
+          },
+        },
+      ),
+  })
   const deleteFileMutation = useMutation({
     mutationFn: (v: { path: string }) =>
       $axios.post('/file/delete', {}, { params: { bucketId, path: v.path } }),
@@ -242,12 +255,20 @@ export default function ExplorerView({
         </ContextMenu.Root>
       </div>
 
-      <button
-        onClick={handleSelectFile}
-        className="absolute bottom-4 right-8 grid h-12 w-12 place-items-center rounded-full bg-blue-500 text-white shadow-lg shadow-blue-200 transition hover:-translate-y-1"
-      >
-        <IconUpload size={20} />
-      </button>
+      <div className="absolute bottom-4 right-8 flex w-32 rounded-full border">
+        <div className="flex flex-col justify-center pl-4">
+          <div className="text-xs leading-tight opacity-25">剩余容量</div>
+          <div className="text-sm leading-tight opacity-75">
+            {spaceIsSuccess ? spaceData.data.data + ' MB' : '-- MB'}
+          </div>
+        </div>
+        <button
+          onClick={handleSelectFile}
+          className="ml-auto grid h-12 w-12 place-items-center rounded-full bg-blue-500 text-white shadow-lg shadow-blue-200 transition hover:-translate-y-1"
+        >
+          <IconUpload size={20} />
+        </button>
+      </div>
 
       <input
         ref={fileInputRef}
