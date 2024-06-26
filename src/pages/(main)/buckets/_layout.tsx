@@ -99,12 +99,21 @@ export default function Layout() {
             <div className="absolute inset-0 flex flex-col gap-2 overscroll-y-auto p-2">
               {isSuccess &&
                 data.data.data
+                  .filter(
+                    ({ foldName }) =>
+                      foldName !== getValidTokenPayload().userEmail,
+                  )
+                  .sort((a, b) => Number(b.isPublic) - Number(a.isPublic))
                   .filter(({ foldName }) => foldName.includes(nameFilter))
                   .map((bucket) => (
                     <BucketItem
                       key={bucket.bucketId}
                       id={bucket.bucketId}
-                      name={bucket.foldName}
+                      name={
+                        bucket.isPublic === '0'
+                          ? '用户 ' + bucket.foldName
+                          : bucket.foldName
+                      }
                       activeId={activeBucketId}
                     />
                   ))}
