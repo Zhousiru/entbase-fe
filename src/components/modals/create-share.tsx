@@ -68,11 +68,18 @@ export function CreateShareModal({
           />
         </div>
       ) : (
-        <TextInput
-          label="共享密码"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <>
+          <TextInput
+            label="存储桶"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <TextInput
+            label="共享密码"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </>
       )}
 
       <div className="mt-4 flex justify-end">
