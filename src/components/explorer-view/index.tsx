@@ -6,7 +6,7 @@ import { useDisclosure } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
 import { IconArrowUp, IconMoodEmpty, IconUpload } from '@tabler/icons-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { RenameFileModal } from '../modals/rename-file'
 import { Item } from './item'
 import { FileItem } from './types'
@@ -25,6 +25,7 @@ export default function ExplorerView({
   className?: string
 }) {
   const [path, setPath] = useState('/')
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const queryClient = useQueryClient()
 
@@ -80,10 +81,33 @@ export default function ExplorerView({
     renameModal[1].open()
   }
   function handleShare(_name: string) {}
-  function handleDelete(_name: string) {
-    deleteFileMutation.mutate({ bucketId, path: joinPaths(path, _name) })
+  function handleDelete(name: string) {
+    deleteFileMutation.mutate({ bucketId, path: joinPaths(path, name) })
   }
   function handleMoveInto(_from: string) {}
+  function handleSelectFile() {
+    fileInputRef.current!.click()
+  }
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (!e.target.files || !e.target.files[0]) return
+
+    const file = e.target.files[0]
+    const form = new FormData()
+    form.set('path', joinPaths(path, file.name))
+    form.set('bucketId', bucketId.toString())
+    form.set('file', file)
+
+    await $axios.post('/file/upload', form, {
+      onUploadProgress(progressEvent) {
+        console.log('Progress', progressEvent.progress)
+      },
+      timeout: 0,
+    })
+
+    queryClient.invalidateQueries({
+      queryKey: ['bucket-list', bucketId, path],
+    })
+  }
 
   return (
     <div className={cn('relative flex flex-col', className)}>
@@ -125,11 +149,18 @@ export default function ExplorerView({
         </div>
       </div>
       <button
-        onClick={() => alert('上传文件')}
+        onClick={handleSelectFile}
         className="absolute bottom-4 right-8 grid h-12 w-12 place-items-center rounded-full bg-blue-500 text-white shadow-lg shadow-blue-200 transition hover:-translate-y-1"
       >
         <IconUpload size={20} />
       </button>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        className="hidden"
+        onChange={handleFileChange}
+      />
 
       <RenameFileModal
         bucketId={bucketId}
