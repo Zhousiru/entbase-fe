@@ -169,6 +169,9 @@ export default function ExplorerView({
     queryClient.invalidateQueries({
       queryKey: ['bucket-list', bucketId, path],
     })
+    queryClient.invalidateQueries({
+      queryKey: ['bucket-space', bucketId],
+    })
   }
 
   return (
