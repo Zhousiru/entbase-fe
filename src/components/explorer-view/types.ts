@@ -5,4 +5,6 @@ export interface FileItem {
   path: string
   updateTime: string
   userId: number
+  userName: string
+  userEmail: string
 }

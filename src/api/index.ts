@@ -23,6 +23,13 @@ $axios.interceptors.request.use(
 
 $axios.interceptors.response.use(
   (response) => {
+    if (
+      response.config.responseType &&
+      response.config.responseType !== 'json'
+    ) {
+      return response
+    }
+
     const respData: Api<unknown> = response.data
 
     if (!respData.success) {
@@ -32,10 +39,7 @@ $axios.interceptors.response.use(
       throw new Error(respData.errorMsg)
     }
 
-    return {
-      ...response,
-      respData,
-    }
+    return response
   },
   (error) => Promise.reject(error),
 )

@@ -1,3 +1,7 @@
+export function getExt(path: string) {
+  return path.substring(path.lastIndexOf('.') + 1)
+}
+
 export function isImageExt(ext: string) {
   if (
     ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'tiff', 'svg'].includes(
@@ -16,7 +20,7 @@ export function isTextExt(ext: string) {
   return false
 }
 
-export function joinPaths(...paths: string[]): string {
+export function joinPaths(...paths: string[]) {
   const normalizedPaths = paths.map((path) =>
     path
       .replace(/\\/g, '/')
@@ -33,7 +37,7 @@ export function joinPaths(...paths: string[]): string {
   return joinedPath
 }
 
-export function gotoParentPath(path: string): string {
+export function gotoParentPath(path: string) {
   if (!path || path === '/') {
     return '/'
   }
@@ -44,4 +48,9 @@ export function gotoParentPath(path: string): string {
   const parentPath = '/' + parts.join('/')
 
   return parentPath || '/'
+}
+
+export function getFilename(path: string) {
+  const index = path.lastIndexOf('/')
+  return path.substring(index + 1)
 }

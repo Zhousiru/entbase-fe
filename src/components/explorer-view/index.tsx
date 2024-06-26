@@ -17,7 +17,9 @@ import React, { useRef, useState } from 'react'
 import { gotoParentPath, joinPaths } from '../../utils/file'
 import { CreateShareModal } from '../modals/create-share'
 import { NewFolderModal } from '../modals/new-folder'
+import { PreviewData, PreviewFileModal } from '../modals/preview-file'
 import { RenameFileModal } from '../modals/rename-file'
+import { RingProgressButton } from '../progress-ring-button'
 import { Item } from './item'
 import { FileItem } from './types'
 
@@ -67,6 +69,9 @@ export default function ExplorerView({
       queryClient.invalidateQueries({
         queryKey: ['bucket-list', bucketId, path],
       })
+      queryClient.invalidateQueries({
+        queryKey: ['bucket-space', bucketId],
+      })
     },
     onError(e) {
       notifications.show({
@@ -101,9 +106,14 @@ export default function ExplorerView({
   const renameModal = useDisclosure()
   const newFolderModal = useDisclosure()
   const createShareModal = useDisclosure()
+  const previewFileModal = useDisclosure()
 
   const [renamePath, setRenamePath] = useState('')
   const [sharePath, setSharePath] = useState('')
+  const [previewPath, setPreviewPath] = useState('')
+  const [previewData, setPreviewData] = useState<PreviewData | null>(null)
+
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null)
 
   function handleClick(name: string) {
     if (!isSuccess) return
@@ -113,11 +123,19 @@ export default function ExplorerView({
       return
     }
 
-    const { isFolder } = data.data.data.find((item) => item.fileName === name)!
+    const { isFolder, createTime, updateTime, userEmail, userName } =
+      data.data.data.find((item) => item.fileName === name)!
     if (isFolder) {
       setPath(joinPaths(path, name))
     } else {
-      alert('Download file' + name)
+      setPreviewPath(joinPaths(path, name))
+      setPreviewData({
+        createTime,
+        updateTime,
+        email: userEmail,
+        username: userName,
+      })
+      previewFileModal[1].open()
     }
   }
   function handleRename(name: string) {
@@ -159,12 +177,21 @@ export default function ExplorerView({
     bucketId && form.set('bucketId', bucketId.toString())
     form.set('file', file)
 
-    await $axios.post('/file/upload', form, {
-      onUploadProgress(progressEvent) {
-        console.log('Progress', progressEvent.progress)
-      },
-      timeout: 0,
-    })
+    try {
+      await $axios.post('/file/upload', form, {
+        onUploadProgress(progressEvent) {
+          setUploadProgress((progressEvent.progress ?? 0) * 100)
+        },
+        timeout: 0,
+      })
+    } catch (e) {
+      notifications.show({
+        ...notificationError,
+        message: (e as Error).message,
+      })
+    } finally {
+      setUploadProgress(null)
+    }
 
     queryClient.invalidateQueries({
       queryKey: ['bucket-list', bucketId, path],
@@ -172,6 +199,8 @@ export default function ExplorerView({
     queryClient.invalidateQueries({
       queryKey: ['bucket-space', bucketId],
     })
+
+    e.target.value = ''
   }
 
   return (
@@ -265,12 +294,13 @@ export default function ExplorerView({
             {spaceIsSuccess ? spaceData.data.data + ' MB' : '-- MB'}
           </div>
         </div>
-        <button
+        <RingProgressButton
           onClick={handleSelectFile}
-          className="ml-auto grid h-12 w-12 place-items-center rounded-full bg-blue-500 text-white shadow-lg shadow-blue-200 transition hover:-translate-y-1"
+          progress={uploadProgress}
+          className="ml-auto"
         >
           <IconUpload size={20} />
-        </button>
+        </RingProgressButton>
       </div>
 
       <input
@@ -296,6 +326,13 @@ export default function ExplorerView({
         path={sharePath}
         opened={createShareModal[0]}
         onClose={createShareModal[1].close}
+      />
+      <PreviewFileModal
+        bucketId={bucketId}
+        path={previewPath}
+        data={previewData}
+        opened={previewFileModal[0]}
+        onClose={previewFileModal[1].close}
       />
     </>
   )
