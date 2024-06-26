@@ -17,7 +17,7 @@ export function RenameFileModal({
   opened,
   onClose,
 }: {
-  bucketId: number
+  bucketId?: number
   path: string
   opened: boolean
   onClose: () => void

@@ -24,7 +24,7 @@ export default function ExplorerView({
   bucketId,
   className,
 }: {
-  bucketId: number
+  bucketId?: number
   className?: string
 }) {
   const [path, setPath] = useState('/')
@@ -47,12 +47,8 @@ export default function ExplorerView({
       ),
   })
   const deleteFileMutation = useMutation({
-    mutationFn: (v: { bucketId: number; path: string }) =>
-      $axios.post(
-        '/file/delete',
-        {},
-        { params: { bucketId: v.bucketId, path: v.path } },
-      ),
+    mutationFn: (v: { path: string }) =>
+      $axios.post('/file/delete', {}, { params: { bucketId, path: v.path } }),
     onSuccess() {
       queryClient.invalidateQueries({
         queryKey: ['bucket-list', bucketId, path],
@@ -109,7 +105,7 @@ export default function ExplorerView({
   }
   function handleShare(_name: string) {}
   function handleDelete(name: string) {
-    deleteFileMutation.mutate({ bucketId, path: joinPaths(path, name) })
+    deleteFileMutation.mutate({ path: joinPaths(path, name) })
   }
   function handleMoveInto(name: string, from: string) {
     moveMutation.mutate({ from, to: name })
@@ -124,7 +120,7 @@ export default function ExplorerView({
     const file = e.target.files[0]
     const form = new FormData()
     form.set('path', joinPaths(path, file.name))
-    form.set('bucketId', bucketId.toString())
+    bucketId && form.set('bucketId', bucketId.toString())
     form.set('file', file)
 
     await $axios.post('/file/upload', form, {
