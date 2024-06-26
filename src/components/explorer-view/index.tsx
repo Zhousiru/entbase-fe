@@ -62,11 +62,10 @@ export default function ExplorerView({
     },
   })
   const moveMutation = useMutation({
-    mutationFn: async (v: { from: string; to: string }) => {
+    mutationFn: async (v: { sourcePath: string; targetPath: string }) => {
       await $axios.post('/file/move', {
         bucketId,
-        sourcePath: joinPaths(path, v.from),
-        targetPath: joinPaths(path, v.to, v.from),
+        ...v,
       })
     },
     onSuccess(_, v) {
@@ -74,7 +73,7 @@ export default function ExplorerView({
         queryKey: ['bucket-list', bucketId, path],
       })
       queryClient.invalidateQueries({
-        queryKey: ['bucket-list', bucketId, joinPaths(path, v.to)],
+        queryKey: ['bucket-list', bucketId, gotoParentPath(v.targetPath)],
       })
     },
     onError(e) {
@@ -92,6 +91,11 @@ export default function ExplorerView({
   function handleClick(name: string) {
     if (!isSuccess) return null
 
+    if (name === '..') {
+      setPath(gotoParentPath(path))
+      return
+    }
+
     const { isFolder } = data.data.data.find((item) => item.fileName === name)!
     if (isFolder) {
       setPath(joinPaths(path, name))
@@ -108,7 +112,15 @@ export default function ExplorerView({
     deleteFileMutation.mutate({ path: joinPaths(path, name) })
   }
   function handleMoveInto(name: string, from: string) {
-    moveMutation.mutate({ from, to: name })
+    const sourcePath = joinPaths(path, from)
+    let targetPath: string
+    if (name === '..') {
+      targetPath = joinPaths(gotoParentPath(path), from)
+    } else {
+      targetPath = joinPaths(path, name, from)
+    }
+
+    moveMutation.mutate({ sourcePath, targetPath })
   }
 
   function handleSelectFile() {
@@ -154,6 +166,17 @@ export default function ExplorerView({
               <div className="absolute inset-0 flex flex-wrap content-start justify-start gap-4 overflow-y-scroll p-4">
                 {isSuccess && (
                   <>
+                    {path !== '/' && (
+                      <Item
+                        name=".."
+                        type="folder"
+                        onClick={handleClick}
+                        onRename={handleRename}
+                        onShare={handleShare}
+                        onDelete={handleDelete}
+                        onMoveInto={handleMoveInto}
+                      />
+                    )}
                     {data.data.data.map((item) => (
                       <Item
                         key={item.path}
@@ -166,7 +189,7 @@ export default function ExplorerView({
                         onMoveInto={handleMoveInto}
                       />
                     ))}
-                    {data.data.data.length === 0 && (
+                    {data.data.data.length === 0 && path === '/' && (
                       <div className="absolute inset-0 grid place-items-center opacity-25">
                         <div className="grid place-items-center gap-2">
                           <IconMoodEmpty stroke={1} size={72} />
