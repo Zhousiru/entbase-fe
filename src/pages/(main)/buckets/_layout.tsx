@@ -11,10 +11,12 @@ import { useState } from 'react'
 import { Link, Outlet, useParams } from 'react-router-dom'
 
 function BucketItem({
+  isUserBucket = false,
   id,
   name,
   activeId,
 }: {
+  isUserBucket?: boolean
   id: number
   name: string
   activeId: number
@@ -33,9 +35,10 @@ function BucketItem({
             activeId === id && 'border-b-blue-500 opacity-100',
           )}
         >
+          {isUserBucket && '用户 '}
           {name}
         </Link>
-        {getValidTokenPayload().isAdmin && (
+        {getValidTokenPayload().isAdmin && !isUserBucket && (
           <button
             onClick={() => {
               editModal[1].open()
@@ -107,13 +110,10 @@ export default function Layout() {
                   .filter(({ foldName }) => foldName.includes(nameFilter))
                   .map((bucket) => (
                     <BucketItem
+                      isUserBucket={bucket.isPublic === '0'}
                       key={bucket.bucketId}
                       id={bucket.bucketId}
-                      name={
-                        bucket.isPublic === '0'
-                          ? '用户 ' + bucket.foldName
-                          : bucket.foldName
-                      }
+                      name={bucket.foldName}
                       activeId={activeBucketId}
                     />
                   ))}
