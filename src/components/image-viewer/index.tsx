@@ -1,8 +1,8 @@
 import { $axios } from '@/api'
 import { cn } from '@/utils/cn'
 import { Progress } from '@mantine/core'
-import { CanceledError } from 'axios'
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useMemo, useState } from 'react'
 
 export function ImageViewer({
   bucketId,
@@ -13,37 +13,28 @@ export function ImageViewer({
 }) {
   const [progress, setProgress] = useState(0)
   const [isLoaded, setIsLoaded] = useState(false)
-  const [srcUrl, setSrcUrl] = useState('')
 
-  useEffect(() => {
-    setProgress(0)
-    setIsLoaded(false)
-
-    const controller = new AbortController()
-
-    $axios
-      .post(
+  const { data, isSuccess } = useQuery({
+    queryKey: ['file', bucketId, path],
+    queryFn: () =>
+      $axios.post(
         '/file/get',
         { bucketId, path },
         {
           responseType: 'blob',
           timeout: 0,
-          signal: controller.signal,
           onDownloadProgress(e) {
             setProgress((e.progress ?? 0) * 100)
           },
         },
-      )
-      .then(({ data }) => {
-        setSrcUrl(URL.createObjectURL(data))
-      })
-      .catch((e) => {
-        if (e instanceof CanceledError) return
-        throw e
-      })
+      ),
+    staleTime: 12 * 60 * 60 * 1000,
+  })
 
-    return () => controller.abort()
-  }, [bucketId, path])
+  const srcUrl = useMemo(() => {
+    if (!isSuccess) return
+    return URL.createObjectURL(data.data)
+  }, [data?.data, isSuccess])
 
   return (
     <div className="h-full bg-gray-50">
