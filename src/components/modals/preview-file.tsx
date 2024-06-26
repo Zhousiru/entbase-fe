@@ -5,6 +5,7 @@ import { IconFileUnknown, IconUser } from '@tabler/icons-react'
 import { ReactNode } from 'react'
 import { DownloadButton } from '../download-button'
 import { ImageViewer } from '../image-viewer'
+import { TextViewer } from '../text-viewer'
 
 export interface PreviewData {
   createTime: string
@@ -60,20 +61,22 @@ export function PreviewFileModal({
         content: 'border rounded-xl',
       }}
     >
-      <div className="relative overflow-hidden rounded-lg border">
-        <PreviewSwitcher
-          ext={getExt(path)}
-          image={<ImageViewer bucketId={bucketId} path={path} />}
-          text={<>123</>}
-          other={
-            <div className="grid h-[300px] place-items-center gap-2">
-              <div className="grid place-items-center opacity-50">
-                <IconFileUnknown stroke={1} size={72} />
-                <p className="text-lg">无法提供此类文件预览</p>
+      <div className="relative h-[65vh] overflow-hidden rounded-lg border">
+        <div className="absolute inset-0 overflow-y-auto">
+          <PreviewSwitcher
+            ext={getExt(path)}
+            image={<ImageViewer bucketId={bucketId} path={path} />}
+            text={<TextViewer bucketId={bucketId} path={path} />}
+            other={
+              <div className="grid h-full place-items-center gap-2">
+                <div className="grid place-items-center opacity-50">
+                  <IconFileUnknown stroke={1} size={72} />
+                  <p className="text-lg">无法提供此类文件预览</p>
+                </div>
               </div>
-            </div>
-          }
-        />
+            }
+          />
+        </div>
         <DownloadButton
           bucketId={bucketId}
           path={path}
