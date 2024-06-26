@@ -1,14 +1,21 @@
 import { $axios } from '@/api'
 import { ApiOk } from '@/api/types'
+import { notificationError } from '@/constants/notifications'
 import { cn } from '@/utils/cn'
 import { useDisclosure } from '@mantine/hooks'
+import { notifications } from '@mantine/notifications'
 import { IconArrowUp, IconMoodEmpty, IconUpload } from '@tabler/icons-react'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { RenameFileModal } from '../modals/rename-file'
 import { Item } from './item'
 import { FileItem } from './types'
 import { gotoParentPath, joinPaths } from './utils'
+
+interface Filed {
+  bucketId: number
+  path: string
+}
 
 export default function ExplorerView({
   bucketId,
@@ -18,6 +25,8 @@ export default function ExplorerView({
   className?: string
 }) {
   const [path, setPath] = useState('/')
+
+  const queryClient = useQueryClient()
 
   const { isSuccess, data } = useQuery({
     queryKey: ['bucket-list', bucketId, path],
@@ -32,6 +41,25 @@ export default function ExplorerView({
           },
         },
       ),
+  })
+  const deleteFileMutation = useMutation({
+    mutationFn: (v: Filed) =>
+      $axios.post(
+        '/file/delete',
+        {},
+        { params: { bucketId: v.bucketId, path: v.path } },
+      ),
+    onSuccess() {
+      queryClient.invalidateQueries({
+        queryKey: ['bucket-list', bucketId, path],
+      })
+    },
+    onError(e) {
+      notifications.show({
+        ...notificationError,
+        message: e.message,
+      })
+    },
   })
 
   const renameModal = useDisclosure()
@@ -52,7 +80,9 @@ export default function ExplorerView({
     renameModal[1].open()
   }
   function handleShare(_name: string) {}
-  function handleDelete(_name: string) {}
+  function handleDelete(_name: string) {
+    deleteFileMutation.mutate({ bucketId, path: joinPaths(path, _name) })
+  }
   function handleMoveInto(_from: string) {}
 
   return (
