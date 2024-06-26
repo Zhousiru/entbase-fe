@@ -9,12 +9,10 @@ import { useEffect, useState } from 'react'
 import { CopyGhostButton } from '../copy-ghost-button'
 
 export function CreateShareModal({
-  bucketId,
   path,
   opened,
   onClose,
 }: {
-  bucketId?: number
   path: string
   opened: boolean
   onClose: () => void
@@ -39,7 +37,6 @@ export function CreateShareModal({
         {},
         {
           params: {
-            bucketId,
             password,
             filePath: path,
           },

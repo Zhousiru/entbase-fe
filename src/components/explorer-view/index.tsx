@@ -269,7 +269,6 @@ export default function ExplorerView({
         onClose={newFolderModal[1].close}
       />
       <CreateShareModal
-        bucketId={bucketId}
         path={sharePath}
         opened={createShareModal[0]}
         onClose={createShareModal[1].close}
