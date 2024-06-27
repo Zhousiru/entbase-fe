@@ -35,3 +35,5 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           source: 'dist/*'
           target: '/home/ubuntu/apps/caddy/site/entbase.dev.mofu.app'
+          strip_components: 1
+          rm: true
