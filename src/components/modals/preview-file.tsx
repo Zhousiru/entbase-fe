@@ -97,10 +97,10 @@ export function PreviewFileModal({
         </div>
         <div className="flex flex-col justify-center text-sm opacity-50">
           <div className="leading-tight">
-            创建于 {formatDate(data?.createTime + 'Z' ?? '')}
+            创建于 {formatDate(data?.createTime + 'Z')}
           </div>
           <div className="leading-tight">
-            更新于 {formatDate(data?.updateTime + 'Z' ?? '')}
+            更新于 {formatDate(data?.updateTime + 'Z')}
           </div>
         </div>
       </div>
