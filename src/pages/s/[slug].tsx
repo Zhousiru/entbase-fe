@@ -20,17 +20,17 @@ export default function Page() {
       password: (value) => (value?.trim() == '' ? '请输入提取码' : null),
     },
   })
-  const getFile = (password: string) => {
-    const href = `/share/get/${id}/pwd=${password}`
-    const a = document.createElement('a')
-    a.href = href // 文件流生成的url
-    a.download = data?.data.data.fileName || '未命名' // 文件名
-    document.body.appendChild(a)
-    a.click()
-    a.remove()
-  }
+
   // const getFileMutation = useMutation({
-  //   mutationFn: (v: string) => $axios.get(`/share/get/${id}/pwd=${v}`),
+  //   mutationFn: (v: string) =>
+  //     $axios
+  //       .get(`/share/get/${id}/pwd=${v}`, {
+  //         params: { password: v },
+  //         responseType: 'blob',
+  //       })
+  //       .then((res) => {
+  //         downloadFileFromResponse(res)
+  //       }),
 
   //   onSuccess({ data }) {
   //     console.log(data)
@@ -55,6 +55,29 @@ export default function Page() {
         }>
       >(`/share/get-info/${id}`),
   })
+  const getFile = (password: string) => {
+    const href = `/share/get/${id}/pwd=${password}`
+    $axios
+      .get(href, {
+        params: { password },
+        responseType: 'blob',
+      })
+      .then((res) => {
+        const _data = res.data
+        const url = window.URL.createObjectURL(
+          new Blob([_data], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          }),
+        )
+        const link = document.createElement('a')
+        link.style.display = 'none'
+        link.href = url
+        link.setAttribute('download', data?.data.data.fileName || '未命名')
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      })
+  }
 
   return (
     <>
