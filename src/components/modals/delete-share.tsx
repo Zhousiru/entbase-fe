@@ -1,42 +1,57 @@
 import { $axios } from '@/api'
+import { ApiOk } from '@/api/types'
 import { notificationError } from '@/constants/notifications'
-import { Button, Modal, TextInput } from '@mantine/core'
+import { Button, Modal, NativeSelect } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { notifications } from '@mantine/notifications'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 interface Fiedls {
-  confirm: string
-  id: number | null
+  id: string
+}
+
+const splice = (fileName: string | null, path: string) => {
+  return '文件名：' + fileName === null || ''
+    ? '未命名'
+    : fileName + '  ' + '文件路径：' + path
 }
 
 export function DeleteShareModal({
-  name,
   opened,
   onClose,
 }: {
-  name: string
   opened: boolean
   onClose: () => void
 }) {
+  const { data } = useQuery({
+    queryKey: ['share-list'],
+    queryFn: () =>
+      $axios.post<
+        ApiOk<
+          Array<{
+            fileName: string
+            startTime: string
+            endTime: string
+            filePath: string
+            shareId: string
+          }>
+        >
+      >('/share/list'),
+  })
+
   const form = useForm<Fiedls>({
     mode: 'uncontrolled',
     initialValues: {
-      confirm: '',
-      id: null,
+      id: '',
     },
     validate: {
-      confirm: (value) =>
-        value.trim() === `确认删除用户账号${name}及其及其用户文件`
-          ? '请正确输入确认信息'
-          : null,
+      id: (value) => (value === '' ? '请选择需要删除的共享' : null),
     },
   })
 
   const queryClient = useQueryClient()
 
   const deleteBucketMutation = useMutation({
-    mutationFn: (v: string) => $axios.delete(`/share/delete/${v}`, {}),
+    mutationFn: (v: string) => $axios.post(`/share/delete/${v}`, {}),
     onSuccess() {
       queryClient.invalidateQueries({ queryKey: ['share-list'] })
       onClose()
@@ -48,22 +63,24 @@ export function DeleteShareModal({
       })
     },
   })
+
   return (
-    <Modal opened={opened} onClose={onClose} title="删除用户">
+    <Modal opened={opened} onClose={onClose} title="删除共享">
       <form
-        onSubmit={form.onSubmit((values) => {
-          deleteBucketMutation.mutate(values.userId.toString())
+        onSubmit={form.onSubmit((v) => {
+          deleteBucketMutation.mutate(v.id)
         })}
       >
-        <TextInput
-          label={
-            <span>
-              请输入 <strong>删除共享 链接{name} </strong>
-              以删除信息
-            </span>
-          }
-          key={form.key('confirm')}
-          {...form.getInputProps('confirm')}
+        <NativeSelect
+          key={form.key('id')}
+          {...form.getInputProps('id')}
+          description="选择需要删除的共享链接"
+          data={data?.data?.data.map((item) => {
+            return {
+              value: item.shareId,
+              label: splice(item.fileName, item.filePath),
+            }
+          })}
         />
 
         <div className="mt-4 flex justify-end gap-2">
