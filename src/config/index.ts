@@ -1,4 +1,4 @@
 export const apiConfig = {
-  baseUrl: 'http://43.134.163.165:18080',
+  baseUrl: 'https://entbase.dev.mofu.app/api',
   protectedUrls: ['/file/', '/admin/', '/user/', '/share/'],
 }
