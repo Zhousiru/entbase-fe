@@ -1,7 +1,9 @@
 import { $axios } from '@/api'
 import { ApiOk } from '@/api/types'
+import { notificationError } from '@/constants/notifications'
 import { Button, Group, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
+import { notifications } from '@mantine/notifications'
 import { useQuery } from '@tanstack/react-query'
 
 export default function Page() {
@@ -21,27 +23,6 @@ export default function Page() {
     },
   })
 
-  // const getFileMutation = useMutation({
-  //   mutationFn: (v: string) =>
-  //     $axios
-  //       .get(`/share/get/${id}/pwd=${v}`, {
-  //         params: { password: v },
-  //         responseType: 'blob',
-  //       })
-  //       .then((res) => {
-  //         downloadFileFromResponse(res)
-  //       }),
-
-  //   onSuccess({ data }) {
-  //     console.log(data)
-  //   },
-  //   onError(e) {
-  //     notifications.show({
-  //       ...notificationError,
-  //       message: e.message,
-  //     })
-  //   },
-  // })
   const { isSuccess, data } = useQuery({
     queryKey: ['bucket-list'],
     queryFn: () =>
@@ -76,6 +57,12 @@ export default function Page() {
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
+      })
+      .catch((e) => {
+        notifications.show({
+          ...notificationError,
+          message: e.message,
+        })
       })
   }
 
