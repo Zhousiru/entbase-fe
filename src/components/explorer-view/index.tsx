@@ -13,7 +13,7 @@ import {
   IconUpload,
 } from '@tabler/icons-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { gotoParentPath, joinPaths } from '../../utils/file'
 import { CreateShareModal } from '../modals/create-share'
 import { NewFolderModal } from '../modals/new-folder'
@@ -33,6 +33,10 @@ export default function ExplorerView({
 }) {
   const [path, setPath] = useState('/')
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    setPath('/')
+  }, [bucketId])
 
   const queryClient = useQueryClient()
 
