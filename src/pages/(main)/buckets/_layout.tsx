@@ -106,9 +106,11 @@ export default function Layout() {
           </div>
           <div className="relative flex-grow bg-gray-50">
             <div className="absolute inset-0 flex flex-col gap-2 overscroll-y-auto p-2">
-              <Alert color="blue" icon={<IconInfoCircle />}>
-                作为管理员，你可以在这里查看所有用户的个人存储桶
-              </Alert>
+              {getValidTokenPayload().isAdmin && (
+                <Alert color="blue" icon={<IconInfoCircle />}>
+                  作为管理员，你可以在这里查看所有用户的个人存储桶
+                </Alert>
+              )}
               {isSuccess &&
                 data.data.data
                   .filter(
