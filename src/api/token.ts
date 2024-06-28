@@ -12,7 +12,11 @@ export function getTokenWithPayload(): [string, TokenPayload] {
   if (!token) {
     throw new EmptyTokenError()
   }
-  const payload = JSON.parse(atob(token.split('.')[1]))
+  const payloadBytes = Uint8Array.from(atob(token.split('.')[1]), (c) =>
+    c.charCodeAt(0),
+  )
+  const payload = JSON.parse(new TextDecoder().decode(payloadBytes))
+  console.log(payload.username)
 
   return [
     token,
