@@ -124,7 +124,7 @@ export default function ExplorerView({
       return
     }
 
-    const { isFolder, createTime, updateTime, userEmail, userName } =
+    const { isFolder, createTime, updateTime, userEmail, userName, userId } =
       data.data.data.find((item) => item.fileName === name)!
     if (isFolder) {
       setPath(joinPaths(path, name))
@@ -135,6 +135,7 @@ export default function ExplorerView({
         updateTime,
         email: userEmail,
         username: userName,
+        id: userId,
       })
       previewFileModal[1].open()
     }

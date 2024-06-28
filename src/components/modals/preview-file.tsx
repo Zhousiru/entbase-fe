@@ -1,8 +1,9 @@
 import { formatDate } from '@/utils/date'
 import { getExt, getFilename, isImageExt, isTextExt } from '@/utils/file'
-import { Avatar, Modal } from '@mantine/core'
-import { IconFileUnknown, IconUser } from '@tabler/icons-react'
+import { Modal } from '@mantine/core'
+import { IconFileUnknown } from '@tabler/icons-react'
 import { ReactNode } from 'react'
+import { Avatar } from '../avatar'
 import { DownloadButton } from '../download-button'
 import { ImageViewer } from '../image-viewer'
 import { TextViewer } from '../text-viewer'
@@ -12,6 +13,7 @@ export interface PreviewData {
   updateTime: string
   username: string
   email: string
+  id: number
 }
 
 function PreviewSwitcher({
@@ -85,9 +87,7 @@ export function PreviewFileModal({
       </div>
       <div className="mt-4 flex justify-between">
         <div className="flex items-center gap-2">
-          <Avatar color="cyan" radius="xl">
-            <IconUser />
-          </Avatar>
+          <Avatar id={data?.id} className="h-10 w-10" />
           <div>
             <div className="leading-tight">{data?.username}</div>
             <div className="text-sm leading-tight opacity-50">

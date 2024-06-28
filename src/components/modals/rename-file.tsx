@@ -30,7 +30,6 @@ export function RenameFileModal({
 
   useEffect(() => {
     if (!opened) return
-    console.log(parent, filename)
     setNewName(filename)
   }, [filename, opened, parent, path])
 

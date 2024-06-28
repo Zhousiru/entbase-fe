@@ -1,6 +1,6 @@
 import { checkIsValidToken, getValidTokenPayload, setToken } from '@/api/token'
-import avatarImage from '@/assets/avatar.jpg'
 import { AppLogo } from '@/components/app-logo'
+import { Avatar } from '@/components/avatar'
 import { cn } from '@/utils/cn'
 import { AppShell, Burger } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
@@ -71,10 +71,10 @@ export default function Layout() {
               <div className="opacity-50">Hi,</div>
               <div className="text-2xl">{tokenPayload.username}</div>
             </div>
-            <div className="rela relative aspect-square h-full flex-shrink-0">
-              <img
-                className="absolute inset-0 rounded-full border object-cover"
-                src={avatarImage}
+            <div className="relative aspect-square h-full flex-shrink-0">
+              <Avatar
+                id={getValidTokenPayload().userId}
+                className="absolute inset-0"
               />
             </div>
           </div>

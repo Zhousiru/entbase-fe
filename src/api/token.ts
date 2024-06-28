@@ -16,7 +16,6 @@ export function getTokenWithPayload(): [string, TokenPayload] {
     c.charCodeAt(0),
   )
   const payload = JSON.parse(new TextDecoder().decode(payloadBytes))
-  console.log(payload.username)
 
   return [
     token,
