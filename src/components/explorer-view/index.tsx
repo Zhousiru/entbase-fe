@@ -22,6 +22,7 @@ import { RenameFileModal } from '../modals/rename-file'
 import { RingProgressButton } from '../progress-ring-button'
 import { Item } from './item'
 import { FileItem } from './types'
+import { generateRandom7Hex } from './utils'
 
 export default function ExplorerView({
   bucketId,
@@ -153,6 +154,24 @@ export default function ExplorerView({
   function handleDelete(name: string) {
     deleteFileMutation.mutate({ path: joinPaths(path, name) })
   }
+  function handleRecycleBin(name: string) {
+    const sourcePath = joinPaths(path, name)
+
+    let index = name.lastIndexOf('.')
+    if (index === -1) {
+      index = name.length
+    }
+
+    const filename = name.substring(0, index)
+    const ext = name.substring(index)
+
+    const targetPath = joinPaths(
+      '/__RECYCLE_BIN',
+      filename + '-' + generateRandom7Hex() + ext,
+    )
+
+    moveMutation.mutate({ sourcePath, targetPath })
+  }
   function handleMoveInto(name: string, from: string) {
     const sourcePath = joinPaths(path, from)
     let targetPath: string
@@ -238,10 +257,16 @@ export default function ExplorerView({
                         key={item.path}
                         name={item.fileName}
                         type={item.isFolder ? 'folder' : 'file'}
+                        recycleBin={
+                          !joinPaths(path, item.fileName).startsWith(
+                            '/__RECYCLE_BIN',
+                          )
+                        }
                         onClick={handleClick}
                         onRename={handleRename}
                         onShare={handleShare}
                         onDelete={handleDelete}
+                        onRecycleBin={handleRecycleBin}
                         onMoveInto={handleMoveInto}
                       />
                     ))}

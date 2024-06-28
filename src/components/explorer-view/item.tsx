@@ -16,18 +16,22 @@ import { isImageExt, isTextExt } from '../../utils/file'
 export function Item({
   name,
   type,
+  recycleBin = false,
   onClick,
   onRename,
   onShare,
   onDelete,
+  onRecycleBin,
   onMoveInto,
 }: {
   name: string
   type: 'folder' | 'file'
+  recycleBin?: boolean
   onClick?: (name: string) => void
   onRename?: (name: string) => void
   onShare?: (name: string) => void
   onDelete?: (name: string) => void
+  onRecycleBin?: (name: string) => void
   onMoveInto?: (name: string, from: string) => void
 }) {
   const extension = name.substring(name.lastIndexOf('.') + 1)
@@ -67,7 +71,7 @@ export function Item({
           onDragEnter={() => setIsDraggingOver(type !== 'file' && !isDragging)}
           onDragLeave={() => setIsDraggingOver(false)}
           onDrop={handleDrop}
-          draggable={name !== '..'}
+          draggable={name !== '..' && name !== '__RECYCLE_BIN'}
         >
           <div className="pointer-events-none -mt-4 grid h-[120px] w-[120px] place-items-center text-blue-500">
             {type === 'folder' && (
@@ -78,6 +82,9 @@ export function Item({
                   className="fill-blue-500/5"
                 />
                 {name === '..' && <IconArrowUp className="absolute mt-1" />}
+                {name === '__RECYCLE_BIN' && (
+                  <IconTrash className="absolute mt-1" />
+                )}
               </>
             )}
             {type === 'file' && (
@@ -93,12 +100,12 @@ export function Item({
             )}
           </div>
           <div className="pointer-events-none -mt-4 max-w-[130px] overflow-hidden text-ellipsis whitespace-nowrap rounded border bg-gray-50 px-1 text-sm text-gray-600 transition group-hover:border-transparent">
-            {name}
+            {name === '__RECYCLE_BIN' ? '回收站' : name}
           </div>
         </button>
       </ContextMenu.Trigger>
       <ContextMenu.Portal>
-        {name !== '..' && (
+        {name !== '..' && name !== '__RECYCLE_BIN' && (
           <>
             <ContextMenu.Content className="flex w-[120px] flex-col gap-1 rounded-lg border bg-white p-1 text-left text-sm shadow-lg">
               <ContextMenu.Item asChild>
@@ -121,15 +128,27 @@ export function Item({
                   </button>
                 </ContextMenu.Item>
               )}
-              <ContextMenu.Item asChild>
-                <button
-                  className="flex items-center gap-1 rounded px-2 py-1 text-red-500 hover:bg-red-500 hover:text-white"
-                  onClick={onDelete && (() => onDelete(name))}
-                >
-                  <IconTrash size={18} stroke={1} />
-                  删除
-                </button>
-              </ContextMenu.Item>
+              {recycleBin ? (
+                <ContextMenu.Item asChild>
+                  <button
+                    className="flex items-center gap-1 rounded px-2 py-1 hover:bg-blue-500 hover:text-white"
+                    onClick={onRecycleBin && (() => onRecycleBin(name))}
+                  >
+                    <IconTrash size={18} stroke={1} />
+                    移到回收站
+                  </button>
+                </ContextMenu.Item>
+              ) : (
+                <ContextMenu.Item asChild>
+                  <button
+                    className="flex items-center gap-1 rounded px-2 py-1 text-red-500 hover:bg-red-500 hover:text-white"
+                    onClick={onDelete && (() => onDelete(name))}
+                  >
+                    <IconTrash size={18} stroke={1} />
+                    永久删除
+                  </button>
+                </ContextMenu.Item>
+              )}
             </ContextMenu.Content>
           </>
         )}
