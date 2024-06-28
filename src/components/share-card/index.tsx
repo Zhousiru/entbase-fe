@@ -40,19 +40,21 @@ export function ShareCard({
         </div>
         <div>文件路径：{filePath}</div>
       </div>
-      <div className="flex flex-row gap-6 self-end text-sm ">
-        <div>起始时间：{startTime}</div>
-        <div>结束时间：{endTime}</div>
+      <div className="flex flex-1 flex-col gap-6 self-end text-sm">
+        {getValidTokenPayload().isAdmin && (
+          <button
+            type="button"
+            className=" self-end border-none text-sm text-red-500 hover:text-red-400"
+            onClick={() => deleteShareMutation.mutate(shareId)}
+          >
+            删除
+          </button>
+        )}
+        <div className="flex flex-row flex-nowrap gap-6 self-end text-sm ">
+          <div>起始时间：{startTime}</div>
+          <div>结束时间：{endTime}</div>
+        </div>
       </div>
-      {getValidTokenPayload().isAdmin && (
-        <button
-          type="button"
-          className=" border-none  text-sm text-red-500 hover:text-red-400"
-          onClick={() => deleteShareMutation.mutate(shareId)}
-        >
-          删除
-        </button>
-      )}
     </div>
   )
 }
