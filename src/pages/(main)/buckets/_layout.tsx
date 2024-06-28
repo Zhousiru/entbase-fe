@@ -4,7 +4,7 @@ import { ApiOk } from '@/api/types'
 import { EditBucketModal } from '@/components/modals/edit-bucket'
 import { NewBucketModal } from '@/components/modals/new-bucket'
 import { cn } from '@/utils/cn'
-import { Alert } from '@mantine/core'
+import { Alert, Badge } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
   IconEdit,
@@ -36,12 +36,16 @@ function BucketItem({
           to={`${id}`}
           replace
           className={cn(
-            'block rounded border-y-2 border-transparent bg-white px-4 py-2 shadow-sm transition',
+            'flex items-center gap-1.5 rounded border-y-2 border-transparent bg-white px-4 py-2 shadow-sm transition',
             activeId !== -1 && 'opacity-50 group-hover:opacity-100',
             activeId === id && 'border-b-blue-500 opacity-100',
           )}
         >
-          {isUserBucket && '用户 '}
+          {isUserBucket && (
+            <Badge variant="default" size="sm">
+              用户
+            </Badge>
+          )}
           {name}
         </Link>
         {getValidTokenPayload().isAdmin && !isUserBucket && (
