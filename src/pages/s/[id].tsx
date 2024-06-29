@@ -7,6 +7,7 @@ import { Button, Group, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { notifications } from '@mantine/notifications'
 import { useQuery } from '@tanstack/react-query'
+import { saveAs } from 'file-saver'
 import { useParams } from 'react-router-dom'
 
 export default function Page() {
@@ -47,19 +48,7 @@ export default function Page() {
         responseType: 'blob',
       })
       .then((res) => {
-        const _data = res.data
-        const url = window.URL.createObjectURL(
-          new Blob([_data], {
-            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          }),
-        )
-        const link = document.createElement('a')
-        link.style.display = 'none'
-        link.href = url
-        link.setAttribute('download', data?.data.data.fileName || '未命名')
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
+        saveAs(res.data, data?.data.data.fileName)
       })
       .catch(() => {
         notifications.show({
