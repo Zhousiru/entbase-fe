@@ -19,7 +19,8 @@ export default function UserView() {
 
     validate: {
       newName: (value) =>
-        value.trim() === '' || getTokenWithPayload()[1].username
+        value.trim() === '' ||
+        value.trim() === getTokenWithPayload()[1].username
           ? '请确保用户名不为空且与先前用户名不同'
           : null,
     },
