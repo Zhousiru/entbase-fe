@@ -77,8 +77,8 @@ export function AdminView() {
       >('/admin/list-users'),
   })
   return (
-    <>
-      Admin View
+    <div className="p-2">
+      <h3 className="text-xl font-bold">用户管理</h3>
       <div className=" inset-0 flex flex-col gap-2 overscroll-y-auto p-2">
         {isSuccess &&
           data.data.data.map((user) => (
@@ -90,6 +90,6 @@ export function AdminView() {
             />
           ))}
       </div>
-    </>
+    </div>
   )
 }
