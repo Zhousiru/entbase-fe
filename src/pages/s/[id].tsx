@@ -1,21 +1,22 @@
 import { $axios } from '@/api'
 import { ApiOk } from '@/api/types'
+import { Avatar } from '@/components/avatar'
 import { notificationError } from '@/constants/notifications'
+import { formatDate } from '@/utils/date'
 import { Button, Group, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { notifications } from '@mantine/notifications'
 import { useQuery } from '@tanstack/react-query'
+import { useParams } from 'react-router-dom'
 
 export default function Page() {
-  const params = new URL(location.href).searchParams
-  const url = window.location.href.match(/\/s\/([^?]+)/) || ''
-  const id = url[1]
-  const password = params.get('password')
+  const params = useParams()
+  const id = params.id!
 
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
-      password: password || '',
+      password: '',
     },
 
     validate: {
@@ -24,7 +25,7 @@ export default function Page() {
   })
 
   const { isSuccess, data } = useQuery({
-    queryKey: ['bucket-list'],
+    queryKey: ['share-info', id],
     queryFn: () =>
       $axios.post<
         ApiOk<{
@@ -36,6 +37,7 @@ export default function Page() {
         }>
       >(`/share/get-info/${id}`),
   })
+
   const getFile = (password: string) => {
     const href = `/share/get/${id}/pwd=${password}`
     $axios
@@ -58,10 +60,10 @@ export default function Page() {
         link.click()
         document.body.removeChild(link)
       })
-      .catch((e) => {
+      .catch(() => {
         notifications.show({
           ...notificationError,
-          message: e.message,
+          message: '密码错误',
         })
       })
   }
@@ -69,17 +71,17 @@ export default function Page() {
   return (
     <>
       {isSuccess ? (
-        <div className="relative flex w-full max-w-[700px] flex-row items-center gap-2 overflow-hidden rounded-md border bg-white p-4 shadow-md">
-          <div className="flex h-full w-[50%] flex-col gap-2 self-start">
-            <div className="text-2xl">共享用户：{data?.data.data.userName}</div>
-            <div className="text-sm font-light">
-              文件：{data?.data.data.fileName}:
+        <div className="flex w-full max-w-[700px] flex-row items-center gap-2 overflow-hidden rounded-md border bg-white p-4 shadow-md">
+          <div className="flex w-[50%] flex-col gap-2">
+            <div className="flex items-center gap-2 text-2xl">
+              <Avatar id={data.data.data.userId} className="h-10 w-10" />
+              {data.data.data.userName}
             </div>
-            <div className="text-sm font-light">
-              路径：{data?.data.data.filePath}:
+            <div className="text font-light">
+              向你共享了 {data.data.data.fileName}
             </div>
-            <div className="text-sm font-light">
-              有效截止时间：{data?.data.data.endTime}:
+            <div className="mt-auto text-sm font-light opacity-50">
+              过期时间：{formatDate(data.data.data.endTime)}
             </div>
           </div>
           <form
@@ -98,7 +100,7 @@ export default function Page() {
           </form>
         </div>
       ) : (
-        <div className="text-center text-2xl ">文件不存在</div>
+        <div className="text-center text-2xl">文件不存在</div>
       )}
     </>
   )
