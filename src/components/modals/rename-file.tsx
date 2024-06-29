@@ -1,10 +1,11 @@
 import { $axios } from '@/api'
 import { notificationError } from '@/constants/notifications'
-import { gotoParentPath } from '@/utils/file'
-import { Button, Modal, TextInput } from '@mantine/core'
+import { getExt, gotoParentPath } from '@/utils/file'
+import { Alert, Button, Modal, TextInput } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
+import { IconAlertCircle } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 function splitPath(path: string) {
   const index = path.lastIndexOf('/')
@@ -23,6 +24,7 @@ export function RenameFileModal({
   onClose: () => void
 }) {
   const [newName, setNewName] = useState('')
+  const [extAlert, setExtAlert] = useState(false)
 
   const [parent, filename] = splitPath(path)
 
@@ -31,6 +33,7 @@ export function RenameFileModal({
   useEffect(() => {
     if (!opened) return
     setNewName(filename)
+    setExtAlert(false)
   }, [filename, opened, parent, path])
 
   const mutation = useMutation({
@@ -55,13 +58,29 @@ export function RenameFileModal({
     },
   })
 
+  function handleChangeNewName(e: React.ChangeEvent<HTMLInputElement>) {
+    const { value } = e.target
+    setNewName(value)
+    if (getExt(value) === getExt(path)) {
+      setExtAlert(false)
+    } else {
+      setExtAlert(true)
+    }
+  }
+
   return (
     <Modal opened={opened} onClose={onClose} title="重命名文件">
       <TextInput
-        label="新文件名(请勿修改文件后缀名！)"
+        label="新文件名"
         value={newName}
-        onChange={(e) => setNewName(e.target.value)}
+        onChange={handleChangeNewName}
       />
+
+      {extAlert && (
+        <Alert color="orange" icon={<IconAlertCircle />} className="mt-2">
+          改变拓展名可能会导致文件不可用
+        </Alert>
+      )}
 
       <div className="mt-4 flex justify-end">
         <Button type="submit" onClick={() => mutation.mutate()}>
