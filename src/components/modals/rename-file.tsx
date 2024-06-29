@@ -26,6 +26,8 @@ export function RenameFileModal({
 
   const [parent, filename] = splitPath(path)
 
+  const extd = filename.split('.').pop()
+
   const queryClient = useQueryClient()
 
   useEffect(() => {
@@ -54,7 +56,16 @@ export function RenameFileModal({
       })
     },
   })
-
+  const rename = () => {
+    if (extd === newName.split('.').pop()) {
+      mutation.mutate()
+    } else {
+      notifications.show({
+        ...notificationError,
+        message: '请勿修改文件后缀名！ ',
+      })
+    }
+  }
   return (
     <Modal opened={opened} onClose={onClose} title="重命名文件">
       <TextInput
@@ -64,7 +75,7 @@ export function RenameFileModal({
       />
 
       <div className="mt-4 flex justify-end">
-        <Button type="submit" onClick={() => mutation.mutate()}>
+        <Button type="submit" onClick={() => rename()}>
           更新
         </Button>
       </div>
