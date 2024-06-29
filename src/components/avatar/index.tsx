@@ -15,10 +15,7 @@ export function Avatar({ id, className }: { id?: number; className?: string }) {
         <img className="absolute inset-0 object-cover" src={defaultAvatar} />
       ) : (
         <img
-          className={cn(
-            'absolute inset-0 hidden  h-[100%] w-[100%] object-cover',
-            loaded && 'block',
-          )}
+          className={cn('hidden h-full w-full object-cover', loaded && 'block')}
           src={apiConfig.baseUrl + '/user/avatar/get/userId=' + id}
           onError={() => setShowDefault(true)}
           onLoad={() => setLoaded(true)}

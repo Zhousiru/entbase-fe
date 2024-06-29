@@ -1,21 +1,26 @@
 import { $axios } from '@/api'
-import { getValidTokenPayload } from '@/api/token'
 import { notificationError } from '@/constants/notifications'
+import { formatDate } from '@/utils/date'
+import { joinPaths } from '@/utils/file'
+import { ActionIcon, Badge, Tooltip } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
+import { IconTrash } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-export function ShareCard({
-  name,
-  startTime,
-  endTime,
-  filePath,
-  shareId,
-}: {
-  name: string
-  startTime: string
+import { Avatar } from '../avatar'
+import { CopyGhostButton } from '../copy-ghost-button'
+
+export interface ShareData {
   endTime: string
+  fileName: string
   filePath: string
   shareId: string
-}) {
+  startTime: string
+  userEmail: string
+  userId: number
+  userName: string
+}
+
+export function ShareCard({ data }: { data: ShareData }) {
   const queryClient = useQueryClient()
 
   const deleteShareMutation = useMutation({
@@ -31,28 +36,45 @@ export function ShareCard({
     },
   })
 
+  const split = data.filePath.split('/')
+  const bucketName = split[2]
+  const path = joinPaths(...split.slice(3))
+
   return (
-    <div className="text-md flex flex-row justify-between gap-6 rounded border p-6 text-gray-600 transition hover:shadow-lg">
-      <div>
-        <div className="font-black ">
-          文件名：
-          {name ? name : '未命名'}
+    <div className="group flex flex-col gap-2 rounded-lg border p-4">
+      <div className="flex items-center gap-2">
+        <Avatar id={data.userId} className="h-10 w-10" />
+        <div>
+          <div className="leading-tight">{data.userName}</div>
+          <div className="leading-tight opacity-50">{data.userEmail}</div>
         </div>
-        <div>文件路径：{filePath}</div>
       </div>
-      <div className="flex flex-1 flex-col gap-6 self-end text-sm">
-        {getValidTokenPayload().isAdmin && (
-          <button
-            type="button"
-            className=" self-end border-none text-sm text-red-500 hover:text-red-400"
-            onClick={() => deleteShareMutation.mutate(shareId)}
-          >
-            删除
-          </button>
-        )}
-        <div className="flex flex-row flex-nowrap gap-6 self-end text-sm ">
-          <div>起始时间：{startTime}</div>
-          <div>结束时间：{endTime}</div>
+
+      <div className="flex flex-col gap-1">
+        <div className="text-lg font-semibold">{data.fileName}</div>
+        <div className="flex items-center gap-1">
+          <Badge variant="light">{bucketName}</Badge>
+          <div className="text-xs opacity-50">{path}</div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-1 text-sm">
+        <div className="opacity-50">过期时间：{formatDate(data.endTime)}</div>
+
+        <div className="ml-auto opacity-0 transition group-hover:opacity-100">
+          <CopyGhostButton
+            value={window.location.origin + '/s/' + data.shareId}
+            position="bottom"
+          />
+          <Tooltip withArrow label="删除" position="bottom">
+            <ActionIcon
+              variant="subtle"
+              color="red"
+              onClick={() => deleteShareMutation.mutate(data.shareId)}
+            >
+              <IconTrash style={{ width: '70%', height: '70%' }} stroke={1.5} />
+            </ActionIcon>
+          </Tooltip>
         </div>
       </div>
     </div>
