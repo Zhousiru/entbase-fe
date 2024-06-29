@@ -1,7 +1,9 @@
 import { $axios } from '@/api'
+import { getValidTokenPayload } from '@/api/token'
 import { ApiOk } from '@/api/types'
 import { ShareCard, ShareData } from '@/components/share-card'
-import { IconMoodEmpty } from '@tabler/icons-react'
+import { Alert } from '@mantine/core'
+import { IconInfoCircle, IconMoodEmpty } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 
 export default function Page() {
@@ -13,6 +15,11 @@ export default function Page() {
   return (
     <>
       <div className="mx-auto flex max-w-screen-md flex-col gap-4 p-4">
+        {getValidTokenPayload().isAdmin && (
+          <Alert color="blue" icon={<IconInfoCircle />}>
+            作为管理员，你可以在这里查看所有用户创建的的共享链接
+          </Alert>
+        )}
         {isSuccess && (
           <>
             {data.data.data.length === 0 && (
