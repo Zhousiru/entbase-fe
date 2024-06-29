@@ -24,7 +24,7 @@ export default function Page() {
     },
   })
 
-  const { isSuccess, data } = useQuery({
+  const { isSuccess, isError, data } = useQuery({
     queryKey: ['share-info', id],
     queryFn: () =>
       $axios.post<
@@ -36,6 +36,7 @@ export default function Page() {
           filePath: string
         }>
       >(`/share/get-info/${id}`),
+    retry: false,
   })
 
   const getFile = (password: string) => {
@@ -70,7 +71,7 @@ export default function Page() {
 
   return (
     <>
-      {isSuccess ? (
+      {isSuccess && (
         <div className="flex w-full max-w-[700px] flex-row items-center gap-2 overflow-hidden rounded-md border bg-white p-4 shadow-md">
           <div className="flex w-[50%] flex-col gap-2">
             <div className="flex items-center gap-2 text-2xl">
@@ -99,9 +100,8 @@ export default function Page() {
             </Group>
           </form>
         </div>
-      ) : (
-        <div className="text-center text-2xl">文件不存在</div>
       )}
+      {isError && <div className="text-center text-2xl">文件不存在</div>}
     </>
   )
 }
