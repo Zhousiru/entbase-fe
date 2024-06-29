@@ -30,7 +30,7 @@ function UserItem({ data }: { data: UserData }) {
         <ActionIcon
           variant="subtle"
           color="red"
-          onClick={() => deleteModal[1].open}
+          onClick={deleteModal[1].open}
           className="ml-auto opacity-0 transition group-hover:opacity-100"
         >
           <IconTrash style={{ width: '70%', height: '70%' }} stroke={1.5} />
