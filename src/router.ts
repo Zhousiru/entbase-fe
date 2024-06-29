@@ -11,6 +11,7 @@ export type Path =
   | `/my`
   | `/register`
   | `/s/:id`
+  | `/seekback`
   | `/settings`
   | `/shared-links`
 

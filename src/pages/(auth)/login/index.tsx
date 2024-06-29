@@ -19,6 +19,8 @@ interface Fiedls {
 }
 
 export default function Page() {
+  const errorTimes = useRef(0)
+
   const form = useForm<Fiedls>({
     mode: 'uncontrolled',
     initialValues: {
@@ -49,6 +51,7 @@ export default function Page() {
         ...notificationError,
         message: e.message,
       })
+      errorTimes.current = errorTimes.current + 1
     },
   })
 
@@ -84,9 +87,15 @@ export default function Page() {
           <CaptchaImage ref={captchaRef} className="self-end" />
         </div>
 
-        <Link to="/register" className="text-xs opacity-50 hover:opacity-75">
-          没有账号？前往注册
-        </Link>
+        {errorTimes.current >= 2 ? (
+          <Link to="/seekback" className="text-xs opacity-50 hover:opacity-75">
+            忘记密码？前往找回
+          </Link>
+        ) : (
+          <Link to="/register" className="text-xs opacity-50 hover:opacity-75">
+            没有账号？前往注册
+          </Link>
+        )}
 
         <Group justify="flex-end" mt="md">
           <Button type="submit">登录</Button>
