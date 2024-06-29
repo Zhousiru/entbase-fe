@@ -16,7 +16,7 @@ export function Avatar({ id, className }: { id?: number; className?: string }) {
       ) : (
         <img
           className={cn(
-            'absolute inset-0 hidden object-cover',
+            'absolute inset-0 hidden  h-[100%] w-[100%] object-cover',
             loaded && 'block',
           )}
           src={apiConfig.baseUrl + '/user/avatar/get/userId=' + id}

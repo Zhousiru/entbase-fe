@@ -1,4 +1,9 @@
-import { checkIsValidToken, getValidTokenPayload, setToken } from '@/api/token'
+import {
+  checkIsValidToken,
+  getTokenWithPayload,
+  getValidTokenPayload,
+  setToken,
+} from '@/api/token'
 import { AppLogo } from '@/components/app-logo'
 import { Avatar } from '@/components/avatar'
 import { cn } from '@/utils/cn'
@@ -73,7 +78,7 @@ export default function Layout() {
             </div>
             <div className="relative aspect-square h-full flex-shrink-0">
               <Avatar
-                id={getValidTokenPayload().userId}
+                id={getTokenWithPayload()[1].userId}
                 className="absolute inset-0"
               />
             </div>
