@@ -20,8 +20,8 @@ export default function UserView() {
     validate: {
       newName: (value) =>
         value.trim() === '' || getTokenWithPayload()[1].username
-          ? null
-          : '请确保用户名不为空且与先前用户名不同',
+          ? '请确保用户名不为空且与先前用户名不同'
+          : null,
     },
   })
   const navigate = useNavigate()
