@@ -88,7 +88,7 @@ export default function Page() {
           >
             <TextInput
               className="w-full"
-              label="提取码:"
+              label="提取码"
               key={form.key('password')}
               {...form.getInputProps('password')}
             />
