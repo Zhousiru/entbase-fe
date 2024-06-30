@@ -1,4 +1,5 @@
 import { $axios } from '@/api'
+import { getValidTokenPayload } from '@/api/token'
 import { ApiOk } from '@/api/types'
 import { ActionIcon, Tooltip } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
@@ -26,16 +27,18 @@ function UserItem({ data }: { data: UserData }) {
         <div className="opacity-50">{data.userEmail}</div>
       </div>
 
-      <Tooltip withArrow label="删除" position="right">
-        <ActionIcon
-          variant="subtle"
-          color="red"
-          onClick={deleteModal[1].open}
-          className="ml-auto opacity-0 transition group-hover:opacity-100"
-        >
-          <IconTrash style={{ width: '70%', height: '70%' }} stroke={1.5} />
-        </ActionIcon>
-      </Tooltip>
+      {getValidTokenPayload().userEmail !== data.userEmail && (
+        <Tooltip withArrow label="删除" position="right">
+          <ActionIcon
+            variant="subtle"
+            color="red"
+            onClick={deleteModal[1].open}
+            className="ml-auto opacity-0 transition group-hover:opacity-100"
+          >
+            <IconTrash style={{ width: '70%', height: '70%' }} stroke={1.5} />
+          </ActionIcon>
+        </Tooltip>
+      )}
 
       <DeleteUserModal
         id={data.userId}
